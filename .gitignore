@@ -2,6 +2,7 @@
 model2dll/model2dll/Debug/*
 model2dll/model2dll/x64/*
 model2dll/.vs/*
+model2dll/ThirdParty/libtensorflow/*
 TFInUnreal/.vs/*
 TFInUnreal/Binaries/*
 TFInUnreal/Intermediate/*
