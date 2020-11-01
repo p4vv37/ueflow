@@ -21,13 +21,13 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MathLibrary.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Tensor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TFLibrary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -38,14 +38,14 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MathLibrary.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="D:\git\cppflow\src\Model.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="D:\git\cppflow\src\Tensor.cpp">
       <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TFLibrary.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

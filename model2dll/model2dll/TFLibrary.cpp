@@ -6,10 +6,10 @@
 
 #include <numeric>
 #include <iomanip>
-#include"MathLibrary.h"
-#include<iostream>
+#include "TFLibrary.h"
+#include <iostream>
 
-int Addition()
+int ExecuteExample()
 {
     // Load model with a path to the .pb file. 
     // An optional std::vector<uint8_t> parameter can be used to supply Tensorflow with
@@ -18,7 +18,7 @@ int Addition()
     // Example:
     // const std::vector<uint8_t> ModelConfigOptions = { 0x32, 0xb, 0x9, 0x9a, 0x99, 0x99, 0x99, 0x99, 0x99, 0xb9, 0x3f, 0x20, 0x1 };
     // Model model("../model.pb", ModelConfigOptions);
-    Model model("D:/git/cppflow/examples/load_model/model.pb");
+    Model model("model.pb");
     model.init();
 
     Tensor input_a{ model, "input_a" };
