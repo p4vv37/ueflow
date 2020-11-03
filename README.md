@@ -15,3 +15,6 @@ And should be placed in:
 model2dll/ThirdParty/libtensorflow
 As an example, path to tensorflow.dll should like like this:
 model2dll\ThirdParty\libtensorflow\lib\tensorflow.dll
+
+
+Work in progress.
