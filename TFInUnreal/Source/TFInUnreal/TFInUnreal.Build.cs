@@ -93,6 +93,5 @@ public class TFInUnreal : ModuleRules
 
 		// Just for easier debug:
 		CopyToProjectBinaries(Path.Combine(ProjectRoot, "Source/ThirdParty/model2dll.pdb"), Target);
-
 	}
 }

@@ -3,9 +3,6 @@
 
 #include "TensorflowFunctionsLibrary.h"
 // #include <TFLibrary.h>
-#include "../ThirdParty/include/TFLibrary.h"
-#include <numeric>
-#include <iomanip>
 
 
 bool UTensorflowFunctionsLibrary::LoadAndRunNetwork()

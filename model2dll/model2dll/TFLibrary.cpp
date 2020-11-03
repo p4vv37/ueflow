@@ -38,3 +38,9 @@ int ExecuteExample()
     std::cout << std::endl;
 	return 3;
 }
+
+
+bool TFNetwork::Initialize()
+{
+    return true;
+}

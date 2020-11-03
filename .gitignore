@@ -8,3 +8,7 @@ TFInUnreal/Binaries/*
 TFInUnreal/Intermediate/*
 TFInUnreal/Saved/*
 
+*.log
+TFInUnreal/Source/ThirdParty/*
+samplesGeneration/backup/*
+model2dll/x64/*

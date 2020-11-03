@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "../ThirdParty/include/TFLibrary.h"
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "TensorflowFunctionsLibrary.generated.h"
