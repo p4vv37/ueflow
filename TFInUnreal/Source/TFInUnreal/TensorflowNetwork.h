@@ -5,6 +5,9 @@
 #include "../ThirdParty/include/TFLibrary.h"
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
+#include "Engine/StaticMeshActor.h" 
+#include "Engine/World.h" 
+#include "Misc/Paths.h" 
 #include "TensorFlowNetwork.generated.h"
 
 UCLASS(BlueprintType, Blueprintable, Category = "TensorFlow")
@@ -18,7 +21,7 @@ public:
 
 	// Called every frame
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		FString ModelPath{ TEXT("model.pb") };
+		FString ModelPath{ "Source/ThirdParty/model.pb" };
 
 	UFUNCTION(BlueprintCallable)
 		bool InitializeModel();
@@ -27,4 +30,5 @@ public:
 		void UpdateScene();
 private:
 	TFNetwork m_network;
+	TArray<AStaticMeshActor*> m_elementsList;
 };

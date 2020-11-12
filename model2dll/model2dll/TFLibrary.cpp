@@ -1,23 +1,9 @@
-// CalculationDll.cpp : Defines the exported functions for the DLL application.
-//
-//#include "pch.h"
-#include "include/Model.h"
-#include "include/Tensor.h"
-
-#include <numeric>
-#include <iomanip>
+// TFLibrary.cpp : Defines the exported functions for the DLL application.
 #include "TFLibrary.h"
-#include <iostream>
+
 
 int ExecuteExample()
 {
-    // Load model with a path to the .pb file. 
-    // An optional std::vector<uint8_t> parameter can be used to supply Tensorflow with
-    // session options. The vector must represent a serialized ConfigProto which can be 
-    // generated manually in python. See create_config_options.py.
-    // Example:
-    // const std::vector<uint8_t> ModelConfigOptions = { 0x32, 0xb, 0x9, 0x9a, 0x99, 0x99, 0x99, 0x99, 0x99, 0xb9, 0x3f, 0x20, 0x1 };
-    // Model model("../model.pb", ModelConfigOptions);
     Model model("model.pb");
     model.init();
 
@@ -40,7 +26,43 @@ int ExecuteExample()
 }
 
 
-bool TFNetwork::Initialize()
+bool TFNetwork::Initialize(const int& numberOfFrames, const int& numberOfBlocks, const char* modelPath)
 {
+    // Tired of crashes, just chec iffile exists.
+    std::ifstream f(modelPath);
+    if (!f.good())
+        return false;
+
+    m_numberOfFrames = numberOfFrames;
+    m_numberOfBlocks = numberOfBlocks;
+
+    m_model = std::unique_ptr<Model>(new Model(modelPath));
+    m_model->init();
+
+    m_input = std::unique_ptr<Tensor>(new Tensor(*m_model, "input"));
+    m_result = std::unique_ptr<Tensor>(new Tensor(*m_model, "result"));
+
+    return true;
+}
+
+
+bool TFNetwork::AddSample(const float* positions, const float* orientations)
+{
+    m_positions.addSample(positions);
+    m_orientations.addSample(orientations);
+    return true;
+}
+
+
+bool TFNetwork::Predict(float* positions, float* orientations)
+{
+    for (int i = 0; i < m_numberOfBlocks; i++)
+    {
+        if (i % 3)
+        {
+            continue;
+        }
+        positions[i] += 0.1;
+    }
     return true;
 }

@@ -12,3 +12,6 @@ TFInUnreal/Saved/*
 TFInUnreal/Source/ThirdParty/*
 samplesGeneration/backup/*
 model2dll/x64/*
+*.sc
+*.npy
+*.png
