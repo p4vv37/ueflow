@@ -195,10 +195,36 @@ bool TFNetwork::AddSample(const float* positions, const float* orientations)
     return true;
 }
 
+bool TFNetwork::Initialize(const int& numberOfFrames, const int& numberOfBlocks, const char* modelPath)
+{
+    // Tired of crashes, just chec iffile exists.
+    std::ifstream f(modelPath);
+    if (!f.good())
+        return false;
+
+    m_numberOfFrames = numberOfFrames;
+    m_numberOfBlocks = numberOfBlocks;
+
+    m_model = std::unique_ptr<Model>(new Model(modelPath));
+    m_model->init();
+
+    m_input = std::unique_ptr<Tensor>(new Tensor(*m_model, "input"));
+    m_result = std::unique_ptr<Tensor>(new Tensor(*m_model, "result"));
+
+    return true;
+}
+
+
+bool TFNetwork::AddSample(const float* positions, const float* orientations)
+{
+    m_positions.addSample(positions);
+    m_orientations.addSample(orientations);
+    return true;
+}
+
 
 bool TFNetwork::Predict(float* positions, float* orientations)
 {
-    // Dummy implementation
     for (int i = 0; i < m_numberOfBlocks; i++)
     {
         if (i % 3)
