@@ -31,4 +31,5 @@ public:
 private:
 	TFNetwork m_network;
 	TArray<AStaticMeshActor*> m_elementsList;
+	int m_numberOfFrames, m_numberOfBlocks;
 };

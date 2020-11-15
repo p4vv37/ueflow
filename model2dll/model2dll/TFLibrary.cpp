@@ -132,7 +132,10 @@ void SamplesCache::addSample(const float* sample)
 //
 
 TFNetwork::~TFNetwork() {
-    // delete m_model;
+    // delete m_model; // Leak or crash? Leak for now.
+    delete m_initialBlocksOrientations;
+    delete m_initialBlocksPositions;
+    delete m_blocksModels;
 }
 
 bool TFNetwork::Initialize(int& numberOfFrames, int& numberOfBlocks, const char* modelPath)
@@ -170,56 +173,65 @@ bool TFNetwork::Initialize(int& numberOfFrames, int& numberOfBlocks, const char*
     // All other lines: <block model relative path>;<pos x>;<pos y>;<pos z>;<sin rotation x><cos rotation x>;<sin rotation y><cos rotation y>;<sin rotation z><cos rotation z>;
     float angle;
     std::vector<float> initialBlocksPositions;
+    std::vector<float> initialBlocksOrientations;
+    std::vector<std::string> blocksModels;
     std::vector<char> array;
     array.push_back('c');
-    m_initialBlocksPositions.push_back(1.0f);
     while (std::getline(file, line)) {
         parsedLine = utils::parseLine(line);
         std::string model(parsedLine[0]);
-        m_blocksModels.push_back(model);
-        m_initialBlocksPositions.push_back(1.0f);
+        blocksModels.push_back(model);
         initialBlocksPositions.push_back(std::stof(parsedLine[1]));
         initialBlocksPositions.push_back(std::stof(parsedLine[2]));
         initialBlocksPositions.push_back(std::stof(parsedLine[3]));
 
         for (std::size_t num{ 0 }; num < 3; num++)
         {
-            angle = 0.0f;
             angle = utils::GetAngle(std::stof(parsedLine[4 + num * 2]), std::stof(parsedLine[5 + num * 2])); 
-            m_initialBlocksOrientations.push_back(angle);
+            initialBlocksOrientations.push_back(angle);
         }
     }
     file.close();
 
-    if (m_blocksModels.size() != m_numberOfBlocks)
+    m_initialBlocksPositions = new float[initialBlocksPositions.size()];
+    std::copy(initialBlocksPositions.begin(), initialBlocksPositions.begin() + initialBlocksPositions.size(), m_initialBlocksPositions);
+    m_initialBlocksOrientations = new float[initialBlocksOrientations.size()];
+    std::copy(initialBlocksOrientations.begin(), initialBlocksOrientations.begin() + initialBlocksOrientations.size(), m_initialBlocksOrientations);
+
+    std::string  resultData;
+    for (std::string modelPath : blocksModels)
+    {
+        resultData.append(modelPath + ";");
+    }
+
+    m_blocksModels = new char[resultData.size() + 1];
+    resultData.copy(m_blocksModels, resultData.size());
+    m_blocksModels[resultData.size()] = '\0';
+
+    if (blocksModels.size() != m_numberOfBlocks)
     {
         return false;
     }
 
-    // m_input = new Tensor(*m_model, "input");
-    // m_result = new Tensor(*m_model, "result");
+    m_input = new Tensor(*m_model, "input_a");
+    m_result = new Tensor(*m_model, "result");
 
     return true;
 }
 
 const char* TFNetwork::getBlocksModels()
 {
-    std::string  resultData;
-    for (std::string modelPath : m_blocksModels)
-    {
-        resultData.append(modelPath + ";");
-    }
-    return &resultData[0];
+    return m_blocksModels;
 }
 
 void TFNetwork::getInitialPositions(float* positions)
 {
-    std::copy(m_initialBlocksPositions.begin(), m_initialBlocksPositions.begin() + m_initialBlocksPositions.size(), positions);
+    std::copy(m_initialBlocksPositions, m_initialBlocksPositions + m_numberOfBlocks, positions);
 }
 
 void TFNetwork::getInitialOrientations(float* orientations)
 {
-    std::copy(m_initialBlocksOrientations.begin(), m_initialBlocksOrientations.begin() + m_initialBlocksOrientations.size(), orientations);
+    std::copy(m_initialBlocksOrientations, m_initialBlocksOrientations + m_numberOfBlocks, orientations);
 }
 
 bool TFNetwork::AddSample(const float* positions, const float* orientations)

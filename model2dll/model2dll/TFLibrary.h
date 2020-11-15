@@ -11,13 +11,12 @@
 #include <sstream>
 #include <assert.h>  
 
-#define PI 3.14159265f
-
 #pragma once
 
 #ifdef TFLIBRARY_EXPORTS
 #include "include/Model.h"
 #include "include/Tensor.h"
+#define PI 3.14159265f
 #define TFLIBRARY_API __declspec(dllexport)  
 
 #else  
@@ -63,9 +62,9 @@ private:
 
     int m_numberOfFrames{ 0 };
     int m_numberOfBlocks{ 0 };
-    std::vector<std::string> m_blocksModels;
-    std::vector<float> m_initialBlocksPositions;
-    std::vector<float> m_initialBlocksOrientations;
+    char* m_blocksModels;
+    float* m_initialBlocksPositions;
+    float* m_initialBlocksOrientations;
 
 public:
 
