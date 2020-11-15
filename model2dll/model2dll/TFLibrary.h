@@ -47,12 +47,10 @@ TFLIBRARY_API int ExecuteExample();
 class TFLIBRARY_API TFNetwork
 {
 private:
-
-//#ifdef TFLIBRARY_EXPORTS
 	Model* m_model;
 
-	std::shared_ptr<Tensor> m_input;
-	std::shared_ptr<Tensor> m_result;
+	Tensor* m_input;
+	Tensor* m_result;
 
     SamplesCache m_positions;
     SamplesCache m_orientations;
@@ -62,9 +60,12 @@ private:
     std::vector<std::string> m_blocksModels;
     std::vector<float> m_initialBlocksPositions;
     std::vector<float> m_initialBlocksOrientations;
-//#endif  // TFLIBRARY_EXPORTS
 
 public:
+
+    TFNetwork() { };
+    ~TFNetwork();
+
 	bool Initialize(int& numberOfFrames, int& numberOfBlocks, const char* modelPath = "model.pb");
 
     const char* getBlocksModels();

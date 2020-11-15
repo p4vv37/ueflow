@@ -106,6 +106,10 @@ std::vector<float> SamplesCache::flatten()
 //  TFNetwork
 //
 
+TFNetwork::~TFNetwork() {
+    delete m_model;
+}
+
 bool TFNetwork::Initialize(int& numberOfFrames, int& numberOfBlocks, const char* modelPath)
 {
     // Tired of crashes, just chec iffile exists.
@@ -115,7 +119,6 @@ bool TFNetwork::Initialize(int& numberOfFrames, int& numberOfBlocks, const char*
 
     m_model = new Model(modelPath);
     m_model->init();
-
 
     std::string cgPath{ modelPath };
     cgPath  = cgPath.substr(0, cgPath.find_last_of('.')) + ".cfg";
@@ -132,6 +135,12 @@ bool TFNetwork::Initialize(int& numberOfFrames, int& numberOfBlocks, const char*
     m_numberOfBlocks = std::stoi(parsedLine[1]);
     numberOfFrames = m_numberOfFrames;
     numberOfBlocks = m_numberOfBlocks;
+
+    m_positions.SetNumberOfElements(numberOfBlocks);
+    m_positions.SetNumberOfSamples(numberOfFrames);
+
+    m_orientations.SetNumberOfElements(numberOfBlocks);
+    m_orientations.SetNumberOfSamples(numberOfFrames);
 
     // All other lines: <block model relative path>;<pos x>;<pos y>;<pos z>;<sin rotation x><cos rotation x>;<sin rotation y><cos rotation y>;<sin rotation z><cos rotation z>;
     float angle;
@@ -162,8 +171,8 @@ bool TFNetwork::Initialize(int& numberOfFrames, int& numberOfBlocks, const char*
         return false;
     }
 
-    //m_input = std::unique_ptr<Tensor>(new Tensor(*m_model, "input"));
-    //m_result = std::unique_ptr<Tensor>(new Tensor(*m_model, "result"));
+    // m_input = new Tensor(*m_model, "input");
+    // m_result = new Tensor(*m_model, "result");
 
     return true;
 }
@@ -206,6 +215,7 @@ bool TFNetwork::Predict(float* positions, float* orientations)
             continue;
         }
         positions[i] += 0.1f;
+        orientations[i] += 0.1f;
     }
     return true;
 }
