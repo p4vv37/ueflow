@@ -86,6 +86,7 @@ public class TFInUnreal : ModuleRules
 		CopyToProjectBinaries(Path.Combine(ProjectRoot, "Source", "ThirdParty", "model.pb"), Target);
 
 		PublicIncludePaths.Add(Path.Combine(ProjectRoot, "Source", "ThirdParty", "include"));
+		PublicIncludePaths.Add("D:/git/ueflow/model2dll/ThirdParty/libtensorflow/include");
 		RuntimeDependencies.Add(Path.Combine(ProjectRoot, "Source", "ThirdParty", "model2dll.dll"));
 		RuntimeDependencies.Add(Path.Combine(ProjectRoot, "Source", "ThirdParty", "tensorflow.dll"));
 		PublicAdditionalLibraries.Add(Path.Combine(ProjectRoot, "Source", "ThirdParty", "model2dll.lib"));

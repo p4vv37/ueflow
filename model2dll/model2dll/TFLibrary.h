@@ -1,18 +1,76 @@
-//Calculation.h
+// TFLibrary.h
+
+#include <sys/stat.h>
+#include <string>
+#include <fstream>
+#include <queue>
+#include <deque>
+#include <math.h>
+#include <filesystem>
+#include <iostream>
+#include <sstream>
+#include <assert.h>  
+
+#define PI 3.14159265f
+
 #pragma once
+
 #ifdef TFLIBRARY_EXPORTS
-#define TFLIBRARY_API __declspec(dllexport)   
+#include "include/Model.h"
+#include "include/Tensor.h"
+#define TFLIBRARY_API __declspec(dllexport)  
+
 #else  
 #define TFLIBRARY_API __declspec(dllimport)   
-#endif  
+#endif  // TFLIBRARY_EXPORTS
+
+class SamplesCache {
+private:
+    unsigned __int64 m_numberOfSamples{ 0 };
+    unsigned __int64 m_numberOfElements{ 0 };
+    std::vector<std::vector<float>> m_data;
+    int m_headIndex{ 0 };
+
+    void UpdateSize();
+public:
+    void SetNumberOfSamples(const int numberOfSamples);
+    void SetNumberOfElements(const int numberOfElements);
+    void addSample(const float* sample);
+    std::vector<float> flatten();
+};
+
+class Tensor;
+class Model;
 
 TFLIBRARY_API int ExecuteExample();
 
-class TFLIBRARY_API TFNetwork 
+class TFLIBRARY_API TFNetwork
 {
-
 private:
-	std::string m_modelPath{ "model.pb" };
+
+//#ifdef TFLIBRARY_EXPORTS
+	Model* m_model;
+
+	std::shared_ptr<Tensor> m_input;
+	std::shared_ptr<Tensor> m_result;
+
+    SamplesCache m_positions;
+    SamplesCache m_orientations;
+
+    int m_numberOfFrames{ 0 };
+    int m_numberOfBlocks{ 0 };
+    std::vector<std::string> m_blocksModels;
+    std::vector<float> m_initialBlocksPositions;
+    std::vector<float> m_initialBlocksOrientations;
+//#endif  // TFLIBRARY_EXPORTS
+
 public:
-	bool Initialize();
+	bool Initialize(int& numberOfFrames, int& numberOfBlocks, const char* modelPath = "model.pb");
+
+    const char* getBlocksModels();
+    void getInitialPositions(float* positions);
+    void getInitialOrientations(float* orientations);
+
+	bool AddSample(const float* positions, const float* orientations);
+	bool Predict(float* positions, float* orientations);
 };

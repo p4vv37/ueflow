@@ -12,3 +12,9 @@ TFInUnreal/Saved/*
 TFInUnreal/Source/ThirdParty/*
 samplesGeneration/backup/*
 model2dll/x64/*
+model2dll/UnitTest1/x64/*
+*.sc
+*.npy
+*.png
+.idea/*
+.ipynb_checkpoints/*
