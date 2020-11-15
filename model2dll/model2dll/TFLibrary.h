@@ -28,15 +28,21 @@ class SamplesCache {
 private:
     unsigned __int64 m_numberOfSamples{ 0 };
     unsigned __int64 m_numberOfElements{ 0 };
-    std::vector<std::vector<float>> m_data;
+    float* m_data{ nullptr };
     int m_headIndex{ 0 };
 
     void UpdateSize();
 public:
+    SamplesCache() {};
+    ~SamplesCache();
+    SamplesCache(const SamplesCache& other);
+    SamplesCache(SamplesCache&& other);
+    SamplesCache& operator=(const SamplesCache& other);
+    SamplesCache& operator=(SamplesCache&& other);
+
     void SetNumberOfSamples(const int numberOfSamples);
     void SetNumberOfElements(const int numberOfElements);
     void addSample(const float* sample);
-    std::vector<float> flatten();
 };
 
 class Tensor;

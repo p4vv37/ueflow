@@ -59,9 +59,51 @@ int ExecuteExample()
 //  SamplesCache
 //
 
+SamplesCache::SamplesCache(const SamplesCache& other) 
+{
+    m_numberOfElements = other.m_numberOfElements;
+    m_numberOfSamples = other.m_numberOfSamples;
+    UpdateSize();
+    std::copy(other.m_data, other.m_data + other.m_numberOfElements * other.m_numberOfSamples, m_data);
+};
+
+SamplesCache::SamplesCache(SamplesCache&& other) : m_data{ other.m_data }, m_numberOfElements{ other.m_numberOfElements }, m_numberOfSamples{ other.m_numberOfSamples } 
+{ 
+    other.m_data = nullptr; 
+};
+
+SamplesCache& SamplesCache::operator=(const SamplesCache& other) 
+{ 
+    if (&other != this) 
+    { 
+        delete[] m_data;
+        std::copy(other.m_data, other.m_data + other.m_numberOfElements * other.m_numberOfSamples, m_data);
+    }       
+    return *this; 
+};
+SamplesCache& SamplesCache::operator=(SamplesCache&& other) 
+{ 
+    if (&other != this) 
+    { 
+        delete[] m_data;
+        m_data = other.m_data;
+        other.m_data = nullptr;
+    }       
+    return *this; 
+};
+
+SamplesCache::~SamplesCache()
+{
+    delete[] m_data;
+}
+
 void SamplesCache::UpdateSize()
 {
-    m_data = std::vector<std::vector<float> >(m_numberOfSamples, std::vector<float>(m_numberOfElements));
+    if (m_data)
+    {
+        delete[] m_data;
+    }
+    m_data = new float[m_numberOfSamples* m_numberOfElements];
     m_headIndex = 0;
 }
 
@@ -82,24 +124,7 @@ void SamplesCache::addSample(const float* sample)
     {
         m_headIndex = 0;
     }
-    memcpy(&m_data[m_headIndex].begin(), sample, sizeof(float) * m_numberOfElements);
-}
-
-std::vector<float> SamplesCache::flatten()
-{
-    std::vector<float> result(m_numberOfElements * m_numberOfSamples);
-    int head = m_headIndex;
-    auto last = std::begin(result);
-    for (int num = 0; num < m_numberOfSamples; num++)
-    {
-        head += num;
-        if (head >= m_numberOfSamples)
-        {
-            head = 0;
-        }
-        last = std::copy(std::begin(m_data[head]), std::end(m_data[head]), last);
-    }
-    return result;
+    memcpy(&m_data[m_headIndex], sample, sizeof(float) * m_numberOfElements);
 }
 
 //
@@ -107,7 +132,7 @@ std::vector<float> SamplesCache::flatten()
 //
 
 TFNetwork::~TFNetwork() {
-    delete m_model;
+    // delete m_model;
 }
 
 bool TFNetwork::Initialize(int& numberOfFrames, int& numberOfBlocks, const char* modelPath)

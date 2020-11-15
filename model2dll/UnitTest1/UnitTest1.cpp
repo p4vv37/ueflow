@@ -21,6 +21,15 @@ namespace MyTest
             std::vector<float> positions(numberOfBlocks, 0);
             std::vector<float> orientations(numberOfBlocks, 0);
             network.AddSample(positions.data(), orientations.data());
+            network.AddSample(positions.data(), orientations.data());
+            network.AddSample(positions.data(), orientations.data());
+            network.AddSample(positions.data(), orientations.data());
+            network.AddSample(positions.data(), orientations.data());
+            network.AddSample(positions.data(), orientations.data());
+            network.AddSample(positions.data(), orientations.data());
+            network.AddSample(positions.data(), orientations.data());
+            network.AddSample(positions.data(), orientations.data());
+            network.AddSample(positions.data(), orientations.data());
 
             // Test predict
             network.Predict(positions.data(), orientations.data());
