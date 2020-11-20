@@ -132,7 +132,9 @@ void SamplesCache::addSample(const float* sample)
 //
 
 TFNetwork::~TFNetwork() {
-    // delete m_model; // Leak or crash? Leak for now.
+    delete m_model;
+    delete m_input;
+    delete m_result;
     delete m_initialBlocksOrientations;
     delete m_initialBlocksPositions;
     delete m_blocksModels;
@@ -164,11 +166,17 @@ bool TFNetwork::Initialize(int& numberOfFrames, int& numberOfBlocks, const char*
     numberOfFrames = m_numberOfFrames;
     numberOfBlocks = m_numberOfBlocks;
 
-    m_positions.SetNumberOfElements(numberOfBlocks);
+    m_positions.SetNumberOfElements(numberOfBlocks * 3);
     m_positions.SetNumberOfSamples(numberOfFrames);
 
-    m_orientations.SetNumberOfElements(numberOfBlocks);
+    m_orientations.SetNumberOfElements(numberOfBlocks * 3);
     m_orientations.SetNumberOfSamples(numberOfFrames);
+
+    m_forceAngles.SetNumberOfElements(numberOfBlocks * 2);
+    m_forceAngles.SetNumberOfSamples(numberOfFrames);
+
+    m_forces.SetNumberOfElements(numberOfBlocks);
+    m_forces.SetNumberOfSamples(numberOfFrames);
 
     // All other lines: <block model relative path>;<pos x>;<pos y>;<pos z>;<sin rotation x><cos rotation x>;<sin rotation y><cos rotation y>;<sin rotation z><cos rotation z>;
     float angle;
@@ -194,9 +202,9 @@ bool TFNetwork::Initialize(int& numberOfFrames, int& numberOfBlocks, const char*
     file.close();
 
     m_initialBlocksPositions = new float[initialBlocksPositions.size()];
-    std::copy(initialBlocksPositions.begin(), initialBlocksPositions.begin() + initialBlocksPositions.size(), m_initialBlocksPositions);
+    std::copy(initialBlocksPositions.begin(), initialBlocksPositions.end(), m_initialBlocksPositions);
     m_initialBlocksOrientations = new float[initialBlocksOrientations.size()];
-    std::copy(initialBlocksOrientations.begin(), initialBlocksOrientations.begin() + initialBlocksOrientations.size(), m_initialBlocksOrientations);
+    std::copy(initialBlocksOrientations.begin(), initialBlocksOrientations.end(), m_initialBlocksOrientations);
 
     std::string  resultData;
     for (std::string modelPath : blocksModels)
@@ -226,18 +234,22 @@ const char* TFNetwork::getBlocksModels()
 
 void TFNetwork::getInitialPositions(float* positions)
 {
-    std::copy(m_initialBlocksPositions, m_initialBlocksPositions + m_numberOfBlocks, positions);
+    std::copy(m_initialBlocksPositions, m_initialBlocksPositions + m_numberOfBlocks * 3, positions);
 }
 
 void TFNetwork::getInitialOrientations(float* orientations)
 {
-    std::copy(m_initialBlocksOrientations, m_initialBlocksOrientations + m_numberOfBlocks, orientations);
+    std::copy(m_initialBlocksOrientations, m_initialBlocksOrientations + m_numberOfBlocks * 3, orientations);
 }
 
-bool TFNetwork::AddSample(const float* positions, const float* orientations)
+bool TFNetwork::AddSample(const float* positions, const float* orientations, const float& force, const float& forceAngle)
 {
     m_positions.addSample(positions);
     m_orientations.addSample(orientations);
+
+    m_forces.addSample(&force);
+    float sinCos[2] = {sin(forceAngle), cos(forceAngle)};
+    m_forceAngles.addSample(sinCos);
     return true;
 }
 

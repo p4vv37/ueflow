@@ -57,6 +57,8 @@ private:
 	Tensor* m_input;
 	Tensor* m_result;
 
+    SamplesCache m_forceAngles;
+    SamplesCache m_forces;
     SamplesCache m_positions;
     SamplesCache m_orientations;
 
@@ -77,6 +79,6 @@ public:
     void getInitialPositions(float* positions);
     void getInitialOrientations(float* orientations);
 
-	bool AddSample(const float* positions, const float* orientations);
+	bool AddSample(const float* positions, const float* orientations, const float& force, const float& forceAngle);
 	bool Predict(float* positions, float* orientations);
 };

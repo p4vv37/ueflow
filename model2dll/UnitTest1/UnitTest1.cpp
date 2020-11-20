@@ -18,18 +18,22 @@ namespace MyTest
             Assert::AreEqual(numberOfFrames, 3);
             Assert::AreEqual(numberOfBlocks, 4);
             // Test add samplle
-            std::vector<float> positions(numberOfBlocks, 0);
-            std::vector<float> orientations(numberOfBlocks, 0);
-            network.AddSample(positions.data(), orientations.data());
-            network.AddSample(positions.data(), orientations.data());
-            network.AddSample(positions.data(), orientations.data());
-            network.AddSample(positions.data(), orientations.data());
-            network.AddSample(positions.data(), orientations.data());
-            network.AddSample(positions.data(), orientations.data());
-            network.AddSample(positions.data(), orientations.data());
-            network.AddSample(positions.data(), orientations.data());
-            network.AddSample(positions.data(), orientations.data());
-            network.AddSample(positions.data(), orientations.data());
+            std::vector<float> positions(numberOfBlocks*3, 0);
+            std::vector<float> orientations(numberOfBlocks * 3, 0);
+            network.AddSample(positions.data(), orientations.data(), 0, 0);
+            network.AddSample(positions.data(), orientations.data(), 0, 0);
+            network.AddSample(positions.data(), orientations.data(), 0, 0);
+            network.AddSample(positions.data(), orientations.data(), 0, 0);
+            network.AddSample(positions.data(), orientations.data(), 0, 0);
+            network.AddSample(positions.data(), orientations.data(), 0, 0);
+            network.AddSample(positions.data(), orientations.data(), 0, 0);
+            network.AddSample(positions.data(), orientations.data(), 0, 0);
+            network.AddSample(positions.data(), orientations.data(), 0, 0);
+            network.AddSample(positions.data(), orientations.data(), 0, 0);
+
+            // test initial 
+            network.getInitialPositions(positions.data());
+            network.getInitialOrientations(orientations.data());
 
             // Test predict
             network.Predict(positions.data(), orientations.data());
