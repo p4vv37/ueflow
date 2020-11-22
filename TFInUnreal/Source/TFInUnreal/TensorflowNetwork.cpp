@@ -59,6 +59,12 @@ bool ATensorFlowNetwork::InitializeModel()
 		NewElement->GetStaticMeshComponent()->SetStaticMesh(mMeshes["box0"]);
 		NewElement->SetActorHiddenInGame(false);
 		NewElement->SetMobility(EComponentMobility::Movable);
+
+		if (!i)
+		{
+			NewElement->Tags.Add(FName("bottomElement"));
+		}
+
 		if (disablePhysics)
 		{
 			NewElement->DisableComponentsSimulatePhysics();
