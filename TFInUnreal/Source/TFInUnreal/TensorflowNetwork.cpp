@@ -6,12 +6,11 @@
 // Sets default values
 ATensorFlowNetwork::ATensorFlowNetwork()
 {
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshFinder(TEXT("StaticMesh'/Game/box.box'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshFinder(TEXT("StaticMesh'/Game/Meshes/box.box'"));
 	mMeshes.Emplace("box0", StaticMeshFinder.Object);
 }
 
 
-// Called every frame
 bool ATensorFlowNetwork::InitializeModel()
 {
 	bool result{ false };
@@ -60,7 +59,17 @@ bool ATensorFlowNetwork::InitializeModel()
 		NewElement->GetStaticMeshComponent()->SetStaticMesh(mMeshes["box0"]);
 		NewElement->SetActorHiddenInGame(false);
 		NewElement->SetMobility(EComponentMobility::Movable);
-		NewElement->DisableComponentsSimulatePhysics();
+		if (disablePhysics)
+		{
+			NewElement->DisableComponentsSimulatePhysics();
+			NewElement->SetActorEnableCollision(false);
+			NewElement->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
+		else
+		{
+			NewElement->GetStaticMeshComponent()->SetSimulatePhysics(true);
+			NewElement->GetStaticMeshComponent()->RegisterComponent();
+		}
 
 		m_elementsList.Add(NewElement);
 	}

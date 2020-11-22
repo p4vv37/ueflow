@@ -30,6 +30,8 @@ public:
 		float forceAngle{0};
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		float force{0};
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		bool disablePhysics{ 1 };
 
 	UFUNCTION(BlueprintCallable)
 		bool InitializeModel();

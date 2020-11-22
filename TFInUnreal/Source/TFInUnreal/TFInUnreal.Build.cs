@@ -92,7 +92,7 @@ public class TFInUnreal : ModuleRules
 		PublicAdditionalLibraries.Add(Path.Combine(ProjectRoot, "Source", "ThirdParty", "model2dll.lib"));
 		PublicAdditionalLibraries.Add(Path.Combine(ProjectRoot, "Source", "ThirdParty", "tensorflow.lib"));
 
-		// Just for easier debug:
+		// Just for easier debug:         
 		CopyToProjectBinaries(Path.Combine(ProjectRoot, "Source/ThirdParty/model2dll.pdb"), Target);
 	}
 }
