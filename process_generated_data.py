@@ -20,6 +20,8 @@ for num, (name, frames) in enumerate(loaded_samples.items()):
         print "{}%".format(100.0 * num / len(loaded_samples))
     frames = sorted(frames)
     np_frames = list()
+    if not len(frames) == 240:
+        continue
     for frame in frames:
         with open(os.path.join("samplesGeneration", "data", frame), "r") as f:
             data = pickle.load(f)
@@ -41,3 +43,5 @@ for num, (name, frames) in enumerate(loaded_samples.items()):
 print(first_frame_description)
 with open("first_frame.cfg", "w") as f:
     f.write(first_frame_description)
+with open(os.path.join(os.getcwd(), "samplesGeneration", "data.p"), "wb") as f:
+    pickle.dump(np_samples, f)

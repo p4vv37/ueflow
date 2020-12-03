@@ -18,3 +18,8 @@ model2dll/UnitTest1/x64/*
 *.png
 .idea/*
 .ipynb_checkpoints/*
+*.bd
+*.bd-journal
+*.h5
+*.p
+venv/*
