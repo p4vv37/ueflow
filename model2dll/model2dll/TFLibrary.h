@@ -14,8 +14,7 @@
 #pragma once
 
 #ifdef TFLIBRARY_EXPORTS
-#include "include/Model.h"
-#include "include/Tensor.h"
+#include "include/cppflow/cppflow.h"
 #define PI 3.14159265f
 #define TFLIBRARY_API __declspec(dllexport)  
 
@@ -44,18 +43,21 @@ public:
     void addSample(const float* sample);
 };
 
-class Tensor;
-class Model;
+namespace cppflow
+{
+    class tensor;
+    class model;
+}
 
 TFLIBRARY_API int ExecuteExample();
 
 class TFLIBRARY_API TFNetwork
 {
 private:
-	Model* m_model;
+    cppflow::model* m_model;
 
-	Tensor* m_input;
-	Tensor* m_result;
+    cppflow::tensor* m_input;
+    cppflow::tensor* m_result;
 
     SamplesCache m_forceAngles;
     SamplesCache m_forces;

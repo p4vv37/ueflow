@@ -34,21 +34,15 @@ namespace utils {
 
 int ExecuteExample()
 {
-    Model model("model.pb");
-    model.init();
-
-    Tensor input_a{ model, "input_a" };
-    Tensor input_b{ model, "input_b" };
-    Tensor output{ model, "result" };
+    cppflow::model model("model.pb");
 
     std::vector<float> data(100);
-    std::iota(data.begin(), data.end(), 0);
+    cppflow::tensor input(data);
 
-    input_a.set_data(data);
-    input_b.set_data(data);
+    auto a = cppflow::tensor(data);
 
-    model.run({ &input_a, &input_b }, output);
-    for (float f : output.get_data<float>()) {
+    auto b = model(a);
+    for (float f : b.get_data<float>()) {
         std::cout << f << " ";
     }
     std::cout << std::endl;
@@ -147,8 +141,7 @@ bool TFNetwork::Initialize(int& numberOfFrames, int& numberOfBlocks, const char*
     if (!f.good())
         return false;
 
-    m_model = new Model(modelPath);
-    m_model->init();
+    m_model = new cppflow::model(modelPath);
 
     std::string cgPath{ modelPath };
     cgPath  = cgPath.substr(0, cgPath.find_last_of('.')) + ".cfg";
@@ -221,8 +214,8 @@ bool TFNetwork::Initialize(int& numberOfFrames, int& numberOfBlocks, const char*
         return false;
     }
 
-    m_input = new Tensor(*m_model, "input_a");
-    m_result = new Tensor(*m_model, "result");
+    m_input = new cppflow::tensor;
+    m_result = new cppflow::tensor;
 
     return true;
 }
