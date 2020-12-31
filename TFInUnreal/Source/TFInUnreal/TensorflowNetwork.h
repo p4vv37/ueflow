@@ -2,7 +2,12 @@
 
 #pragma once
 
-#include "../ThirdParty/include/TFLibrary.h"
+//#include "../ThirdParty/include/TFLibrary.h"
+
+#include "cppflow/ops.h"
+#include "cppflow/model.h"
+#include "cppflow/datatype.h"
+
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "Engine/StaticMeshActor.h" 
@@ -10,7 +15,19 @@
 #include "Components/StaticMeshComponent.h" 
 #include "Engine/World.h" 
 #include "Misc/Paths.h"
+#include "Misc/FileHelper.h" 
+#include "Misc/Paths.h" 
+#include "Containers/RingBuffer.h" 
+#include <chrono>
+#include <thread>
 #include "TensorFlowNetwork.generated.h"
+
+
+namespace utils {
+	inline float GetAngle(const float& sin, const float& cos) { return atan2(sin, cos) * 180.0f / PI; }
+	inline void GetSinCos(const float& angle, float& s, float& c) { s = sin(angle); c = cos(angle); }
+} // utils
+
 
 UCLASS(BlueprintType, Blueprintable, Category = "TensorFlow")
 class TFINUNREAL_API ATensorFlowNetwork : public AActor
@@ -24,7 +41,7 @@ public:
 		TMap < FString, UStaticMesh*> mMeshes;
 	// Called every frame
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		FString ModelPath{ "Source/ThirdParty/model.pb" };
+		FString ModelPath { "Source/ThirdParty/model.pb" };
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		float forceAngle{0};
@@ -43,7 +60,12 @@ public:
 private:
 	float mSeconds{ 0 };
 	int mForceFramesLeft{ 0 };
-	TFNetwork m_network;
+
+	float m_positionsIndex{ 0.0f };
+	float m_orientationsIndex{ 0.0f };
+	TRingBuffer<float> m_frames;
+	TArray<FString*> m_models;
+	TUniquePtr<cppflow::model> m_model;
 	TArray<AStaticMeshActor*> m_elementsList;
-	int m_numberOfFrames, m_numberOfBlocks;
+	int m_numberOfFrames{ -1 }, m_numberOfBlocks{ -1 };
 };

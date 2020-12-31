@@ -51,16 +51,6 @@ public class TFInUnreal : ModuleRules
 	public TFInUnreal(ReadOnlyTargetRules Target) : base(Target)
 	{
 
-		// Compile and copy dll. This bat can be also executed externally.
-		System.Diagnostics.Process process = new System.Diagnostics.Process();
-		System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-		//startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-		startInfo.WorkingDirectory = Path.Combine(ProjectRoot, "../");
-		startInfo.FileName = Path.Combine(ProjectRoot, "../build_dll.bat");
-		process.StartInfo = startInfo;
-		process.Start();
-		process.WaitForExit();
-
 
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
@@ -76,23 +66,10 @@ public class TFInUnreal : ModuleRules
 
 		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true 
 
-		// string model2dllLibPath = CopyToProjectBinaries(Path.Combine(ProjectRoot, "Source/ThirdParty/model2dll.lib"), Target);
-		// string tfLibPath = CopyToProjectBinaries(Path.Combine(ProjectRoot, "Source/ThirdParty/tensorflow.lib"), Target);
-
-		CopyToProjectBinaries(Path.Combine(ProjectRoot, "Source", "ThirdParty", "model2dll.dll"), Target);
-		CopyToProjectBinaries(Path.Combine(ProjectRoot, "Source", "ThirdParty", "tensorflow.dll"), Target);
-		CopyToProjectBinaries(Path.Combine(ProjectRoot, "Source", "ThirdParty", "model2dll.lib"), Target);
-		CopyToProjectBinaries(Path.Combine(ProjectRoot, "Source", "ThirdParty", "tensorflow.lib"), Target);
-		CopyToProjectBinaries(Path.Combine(ProjectRoot, "Source", "ThirdParty", "model.pb"), Target);
-
 		PublicIncludePaths.Add(Path.Combine(ProjectRoot, "Source", "ThirdParty", "include"));
-		PublicIncludePaths.Add("D:/git/ueflow/model2dll/ThirdParty/libtensorflow/include");
-		RuntimeDependencies.Add(Path.Combine(ProjectRoot, "Source", "ThirdParty", "model2dll.dll"));
-		RuntimeDependencies.Add(Path.Combine(ProjectRoot, "Source", "ThirdParty", "tensorflow.dll"));
-		PublicAdditionalLibraries.Add(Path.Combine(ProjectRoot, "Source", "ThirdParty", "model2dll.lib"));
-		PublicAdditionalLibraries.Add(Path.Combine(ProjectRoot, "Source", "ThirdParty", "tensorflow.lib"));
 
-		// Just for easier debug:         
-		CopyToProjectBinaries(Path.Combine(ProjectRoot, "Source/ThirdParty/model2dll.pdb"), Target);
+		// RuntimeDependencies.Add(Path.Combine(ProjectRoot, "Source", "ThirdParty", "lib", "tensorflow.dll"));
+		// PublicAdditionalLibraries.Add(Path.Combine(ProjectRoot, "Source", "ThirdParty", "lib", "tensorflow.lib"));
+		PublicAdditionalLibraries.Add("D:/git/cppflow/examples/efficientnet/build/Release/tensorflow.lib");
 	}
 }

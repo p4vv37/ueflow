@@ -14,7 +14,7 @@ bool UTensorflowFunctionsLibrary::LoadAndRunNetwork()
     // Example:
     // const std::vector<uint8_t> ModelConfigOptions = { 0x32, 0xb, 0x9, 0x9a, 0x99, 0x99, 0x99, 0x99, 0x99, 0xb9, 0x3f, 0x20, 0x1 };
     // Model model("../model.pb", ModelConfigOptions);
-    int x = ExecuteExample();
+    int x = 1;
 
 	UE_LOG(LogTemp, Warning, TEXT("Your message"));
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Blocking Hit =:"));
