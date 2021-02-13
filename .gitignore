@@ -24,4 +24,5 @@ model2dll/UnitTest1/x64/*
 *.p
 venv/*
 samplesGeneration/logs/*
-model/saved_model/*
+model/*
+model/improved_model/keras_metadata.pb

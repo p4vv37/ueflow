@@ -24,7 +24,7 @@
 
 
 namespace utils {
-	inline float GetAngle(const float& sin, const float& cos) { return atan2(sin, cos) * 180.0f / PI; }
+	inline float  GetAngle(const float& sin, const float& cos) { return atan2(sin, cos) * 180.0f / PI; }
 	inline void GetSinCos(const float& angle, float& s, float& c) { s = sin(angle); c = cos(angle); }
 } // utils
 
@@ -63,7 +63,7 @@ private:
 
 	float m_positionsIndex{ 0.0f };
 	float m_orientationsIndex{ 0.0f };
-	TRingBuffer<float> m_frames;
+	TArray<float> m_lastFrame;
 	TArray<FString*> m_models;
 	TUniquePtr<cppflow::model> m_model;
 	TArray<AStaticMeshActor*> m_elementsList;
