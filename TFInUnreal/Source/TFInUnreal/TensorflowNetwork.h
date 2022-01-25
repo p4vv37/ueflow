@@ -41,7 +41,7 @@ public:
 		TMap < FString, UStaticMesh*> mMeshes;
 	// Called every frame
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		FString ModelPath { "Source/ThirdParty/model.pb" };
+		FString ModelPath { "Source/ThirdParty/model/saved_model.pb" };
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		float forceAngle{0};
