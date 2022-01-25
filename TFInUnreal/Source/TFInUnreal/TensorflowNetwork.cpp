@@ -21,7 +21,7 @@ bool ATensorFlowNetwork::InitializeModel()
 
     std::string stringPath = std::string(TCHAR_TO_UTF8(*ModelPath));
     cppflow::model model (stringPath);
-    // m_model = MakeUnique<cppflow::model>(std::string(TCHAR_TO_UTF8(*ModelPath)));
+    m_model = MakeUnique<cppflow::model>(std::string(TCHAR_TO_UTF8(*ModelPath)));
 	return true;
 }
 
