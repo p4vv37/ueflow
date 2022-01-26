@@ -37,11 +37,11 @@ class TFINUNREAL_API ATensorFlowNetwork : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ATensorFlowNetwork();
-	UPROPERTY()
-		TMap < FString, UStaticMesh*> mMeshes;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		UStaticMesh* mMesh;
 	// Called every frame
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		FString ModelPath { "Source/ThirdParty/model/saved_model.pb" };
+		FString ModelPath { "Source/ThirdParty/generator/saved_model.pb" };
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		float forceAngle{0};
