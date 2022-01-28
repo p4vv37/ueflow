@@ -28,7 +28,7 @@ UTexture2D* WriteDataToTexture(UTexture2D* ParamsTex, std::vector<float> data)
 
     for (int32 VoxelIndex1DInChunk = 0; VoxelIndex1DInChunk < NumPixelsInTexture; ++VoxelIndex1DInChunk)
     {
-        NewPixels[VoxelIndex1DInChunk] = (data[VoxelIndex1DInChunk] + 0.5) * 256;
+        NewPixels[VoxelIndex1DInChunk] = (data[VoxelIndex1DInChunk] + 3) * 512;
     }
 
     FTexture2DMipMap& Mip0 = ParamsTex->PlatformData->Mips[0];
