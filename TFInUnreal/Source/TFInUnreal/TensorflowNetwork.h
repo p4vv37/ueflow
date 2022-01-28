@@ -52,12 +52,15 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		bool InitializeModel();
+		//void UpdateTextureRegion(FTexture2DRHIRef TextureRHI, int32 MipIndex, uint32 NumRegions, FUpdateTextureRegion2D Region, uint32 SrcPitch, uint32 SrcBpp, uint8* SrcData, TFunction<void(uint8* SrcData)> DataCleanupFunc);
 
 	UFUNCTION(BlueprintCallable)
 		void UpdateScene();
 	UFUNCTION(BlueprintCallable)
 		void ApplyForce();
 private:
+	UTexture2D* Texture;
+	UMaterialInstanceDynamic* DynamicMaterial;
 	float mSeconds{ 0 };
 	int mForceFramesLeft{ 0 };
 
