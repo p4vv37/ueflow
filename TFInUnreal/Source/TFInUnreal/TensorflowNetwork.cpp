@@ -45,7 +45,7 @@ UTexture2D* WriteDataToTexture(UTexture2D* ParamsTex, std::vector<float> data)
 ATensorFlowNetwork::ATensorFlowNetwork()
 {
     static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshFinder(TEXT("StaticMesh'/Game/Meshes/waterSurface.waterSurface'"));
-    mMesh = StaticMeshFinder.Object;
+    Mesh = StaticMeshFinder.Object;
 }
 
 
@@ -82,13 +82,13 @@ bool ATensorFlowNetwork::InitializeModel()
     SpawnParams.Instigator = GetInstigator();
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
     AStaticMeshActor* NewElement = GetWorld()->SpawnActor<AStaticMeshActor>(SpawnParams);
-    NewElement->GetStaticMeshComponent()->SetStaticMesh(mMesh);
+    NewElement->GetStaticMeshComponent()->SetStaticMesh(Mesh);
     NewElement->SetActorHiddenInGame(false);
     NewElement->SetMobility(EComponentMobility::Movable);
 
     std::string stringPath = std::string(TCHAR_TO_UTF8(*ModelPath));
     cppflow::model model (stringPath);
-    m_model = MakeUnique<cppflow::model>(std::string(TCHAR_TO_UTF8(*ModelPath)));
+    Model = MakeUnique<cppflow::model>(std::string(TCHAR_TO_UTF8(*ModelPath)));
 
     UE_LOG(LogTemp, Warning, TEXT("********************************************"));
     UE_LOG(LogTemp, Warning, TEXT("********************************************"));
@@ -107,20 +107,15 @@ bool ATensorFlowNetwork::InitializeModel()
 
 
     // Creates Texture2D to store TextureRenderTarget content
-    Texture = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
-    Texture = WriteDataToTexture(Texture, water);
+    WaterHeight = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
+    WaterHeight = WriteDataToTexture(WaterHeight, water);
 
     
     DynamicMaterial = NewElement->GetStaticMeshComponent()->CreateAndSetMaterialInstanceDynamic(0);
-    DynamicMaterial->SetTextureParameterValue("TextureMap", Texture);
+    DynamicMaterial->SetTextureParameterValue("TextureMap", WaterHeight);
     DynamicMaterial->SetVectorParameterValue("Color", FColor::Red);
 
 	return true;
-}
-
-void ATensorFlowNetwork::ApplyForce()
-{
-    mForceFramesLeft = 1;
 }
 
 // #pragma optimize( "", off )
