@@ -70,6 +70,7 @@ bool ATensorFlowNetwork::InitializeModel()
 {
     if (!FPaths::DirectoryExists(ModelPath))
     {
+        UE_LOG(LogTemp, Error, TEXT("Model path incorrect: no saved model found in %s"), *ModelPath);
         return false;
     }
 
@@ -105,57 +106,6 @@ bool ATensorFlowNetwork::InitializeModel()
     UE_LOG(LogTemp, Warning, TEXT("********************************************"));
 
 
-    /*
-    if (NewElement->GetStaticMeshComponent()->GetStaticMesh()->RenderData->LODResources.Num() > 0)
-    {
-        FPositionVertexBuffer* VertexBuffer = &NewElement->GetStaticMeshComponent()->GetStaticMesh()->RenderData->LODResources[0].VertexBuffers.PositionVertexBuffer;
-        if (VertexBuffer)
-        {
-            const int32 VertexCount = VertexBuffer->GetNumVertices();
-            for (int32 Index = 0; Index < VertexCount; Index++)
-            {
-                VertexBuffer->VertexPosition(Index) += FVector(float(Index), float(100* Index), float(10000 * Index));
-            }
-        }
-    }
-
-    UTextureRenderTarget2D* RenderTarget = NewObject<UTextureRenderTarget2D>(this);
-    RenderTarget->InitCustomFormat(2, 2, PF_B8G8R8A8, true);
-    static uint8 rgbw[4 * 4] = {
-                           0,   0,   255, 255,
-                           0,   255,   0, 255,
-                           255,   0,   0, 255,
-                           255, 255, 255, 255
-
-    };
-    auto region = FUpdateTextureRegion2D(0, 0, 0, 0, 2, 2);
-    const uint8 x = 4
-        + region.SrcY * 2 * 4
-        + region.SrcX * 4;
-    ENQUEUE_RENDER_COMMAND(UpdateTextureRegionsData)(
-        [=](FRHICommandListImmediate& RHICmdList)
-        {
-            check(RenderTarget->GameThread_GetRenderTargetResource()->GetRenderTargetTexture().IsValid());
-            RHIUpdateTexture2D(
-                RenderTarget->GameThread_GetRenderTargetResource()->GetRenderTargetTexture(),
-                0,
-                region,
-                2 * 4,
-                &x
-            );
-        });
-
-    FString PackageName;
-    FString Name;
-    FAssetToolsModule& AssetToolsModule = FModuleManager::Get().LoadModuleChecked<FAssetToolsModule>("AssetTools");
-    AssetToolsModule.Get().CreateUniqueAssetName(mMesh->GetOutermost()->GetName(), TEXT("_Tex"), PackageName, Name);
-    UTexture* NewObj = RenderTarget->ConstructTexture2D(CreatePackage(NULL, *PackageName), Name, mMesh->GetMaskedFlags(), CTF_Default, NULL);
-    mMesh->GetMaterial(0)->GetTextureParameterValue(TEXT("TextureMap"), NewObj);
-    */
-
-
-
-
     // Creates Texture2D to store TextureRenderTarget content
     Texture = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
     Texture = WriteDataToTexture(Texture, water);
@@ -174,10 +124,9 @@ void ATensorFlowNetwork::ApplyForce()
 }
 
 // #pragma optimize( "", off )
-// Called every frame
 void ATensorFlowNetwork::UpdateScene()
 {
 }
 
-#pragma optimize( "", on ) 
+// #pragma optimize( "", on ) 
 
