@@ -20,9 +20,9 @@
 UTexture2D* WriteDataToTexture(UTexture2D* ParamsTex, std::vector<float> data)
 {
     const int32 NumPixelsInTexture = ParamsTex->GetSizeX()* ParamsTex->GetSizeY();  // Includes empty space at the end, not used by any chunks
-    TArray<uint8> NewPixels = TArray<uint8>();
-    uint8 ColorDefault = 0;
-    constexpr SIZE_T PIXEL_DATA_SIZE = sizeof(uint8);
+    TArray<float> NewPixels = TArray<float>();
+    float ColorDefault = 0;
+    constexpr SIZE_T PIXEL_DATA_SIZE = sizeof(float);
     NewPixels.Init(ColorDefault, NumPixelsInTexture);
 
 
@@ -157,7 +157,7 @@ bool ATensorFlowNetwork::InitializeModel()
 
 
     // Creates Texture2D to store TextureRenderTarget content
-    Texture = UTexture2D::CreateTransient(256, 256, PF_G8);
+    Texture = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
     Texture = WriteDataToTexture(Texture, water);
 
     
