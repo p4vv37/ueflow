@@ -95,8 +95,18 @@ bool ATensorFlowNetwork::InitializeModel()
     UE_LOG(LogTemp, Warning, TEXT("********************************************"));
     UE_LOG(LogTemp, Warning, TEXT("********************************************"));
     UE_LOG(LogTemp, Warning, TEXT("********************************************"));
+    
     auto water = ReadData("D:/dnn/data/0_0.158275115632_500__0.txt");
+    for (int n = 0; n < water.size(); n++) {
+        water[n] += 10;
+        water[n] /= 20;
+    }
+
     auto whiteWater = ReadData("D:/dnn/data/0_0.158275115632_500_whitewater_0.txt");
+    for (int n = 0; n < whiteWater.size(); n++) {
+        whiteWater[n] /= 7.0;
+    }
+    
     auto input = ReadData("D:/dnn/data/0_0.158275115632_500_input_0.txt");
     auto velocity = ReadData("D:/dnn/data/0_0.158275115632_500_velocity_0.txt");
     UE_LOG(LogTemp, Warning, TEXT("********************************************"));
@@ -110,6 +120,9 @@ bool ATensorFlowNetwork::InitializeModel()
     WaterHeight = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
     WaterHeight = WriteDataToTexture(WaterHeight, water);
 
+    WhiteWater = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
+    WhiteWater = WriteDataToTexture(WhiteWater, whiteWater);
+
     
     DynamicMaterial = NewElement->GetStaticMeshComponent()->CreateAndSetMaterialInstanceDynamic(0);
     DynamicMaterial->SetTextureParameterValue("TextureMap", WaterHeight);
@@ -121,6 +134,23 @@ bool ATensorFlowNetwork::InitializeModel()
 // #pragma optimize( "", off )
 void ATensorFlowNetwork::UpdateScene()
 {
+}
+// #pragma optimize( "", off )
+void ATensorFlowNetwork::ChangeDisplayMode(const int NewMode)
+{
+    if (NewMode == 0) {
+        DynamicMaterial->SetTextureParameterValue("TextureMap", WaterHeight);
+        DynamicMaterial->SetScalarParameterValue("HeightDisplay", 0.0);
+    }
+    else if (NewMode == 1) {
+        DynamicMaterial->SetTextureParameterValue("TextureMap", WaterHeight);
+        DynamicMaterial->SetScalarParameterValue("HeightDisplay", 0.0);
+    }
+    else if (NewMode == 2) {
+        DynamicMaterial->SetTextureParameterValue("TextureMap", WhiteWater);
+        DynamicMaterial->SetScalarParameterValue("HeightDisplay", 1.0);
+    }
+    DisplayMode = NewMode;
 }
 
 // #pragma optimize( "", on ) 

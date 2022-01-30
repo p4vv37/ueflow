@@ -44,6 +44,8 @@ public:
 		bool InitializeModel();
 	UFUNCTION(BlueprintCallable)
 		void UpdateScene();
+	UFUNCTION(BlueprintCallable)
+		void ChangeDisplayMode(const int NewMode);
 
 
 	// Old: remove after updating blueprints.
@@ -57,6 +59,12 @@ private:
 
 	UTexture2D* WaterHeight; // (256, 256, 1)
 	UTexture2D* WhiteWater; // (256, 256, 1)
+	UTexture2D* StarADistanceMap; // (256, 256, 1)
+	UTexture2D* CircleDistanceMap; // (256, 256, 1)
+	UTexture2D* TriangleDistanceMap; // (256, 256, 1)
+	UTexture2D* SquareDistanceMap; // (256, 256, 1)
+	UTexture2D* StarBDistanceMap; // (256, 256, 1)
+
 	std::vector<float> InputGradient;
 	std::vector<float> InputRotationCosinus;
 	std::vector<float> InputRotationSinus; 
