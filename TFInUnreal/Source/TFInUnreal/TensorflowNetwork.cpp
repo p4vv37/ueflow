@@ -125,7 +125,8 @@ bool ATensorFlowNetwork::InitializeModel()
 
     
     DynamicMaterial = NewElement->GetStaticMeshComponent()->CreateAndSetMaterialInstanceDynamic(0);
-    DynamicMaterial->SetTextureParameterValue("TextureMap", WaterHeight);
+    DynamicMaterial->SetTextureParameterValue("HeightMap", WaterHeight);
+    DynamicMaterial->SetTextureParameterValue("WhitewaterMap", WhiteWater);
     DynamicMaterial->SetVectorParameterValue("Color", FColor::Red);
 
 	return true;
@@ -139,16 +140,16 @@ void ATensorFlowNetwork::UpdateScene()
 void ATensorFlowNetwork::ChangeDisplayMode(const int NewMode)
 {
     if (NewMode == 0) {
-        DynamicMaterial->SetTextureParameterValue("TextureMap", WaterHeight);
-        DynamicMaterial->SetScalarParameterValue("HeightDisplay", 0.0);
+        DynamicMaterial->SetScalarParameterValue("HeightDisplay", 1.0);
+        DynamicMaterial->SetScalarParameterValue("WhiteWaterDisplay", 1.0);
     }
     else if (NewMode == 1) {
-        DynamicMaterial->SetTextureParameterValue("TextureMap", WaterHeight);
-        DynamicMaterial->SetScalarParameterValue("HeightDisplay", 0.0);
+        DynamicMaterial->SetScalarParameterValue("HeightDisplay", 1.0);
+        DynamicMaterial->SetScalarParameterValue("WhiteWaterDisplay", 0.0);
     }
     else if (NewMode == 2) {
-        DynamicMaterial->SetTextureParameterValue("TextureMap", WhiteWater);
-        DynamicMaterial->SetScalarParameterValue("HeightDisplay", 1.0);
+        DynamicMaterial->SetScalarParameterValue("HeightDisplay", 0.0);
+        DynamicMaterial->SetScalarParameterValue("WhiteWaterDisplay", 1.0);
     }
     DisplayMode = NewMode;
 }
