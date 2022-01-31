@@ -118,6 +118,8 @@ bool ATensorFlowNetwork::InitializeModel()
 
     for (int x = 0; x < 64 * 64; x++) {
         InputGradient.push_back(x);
+        InputRotationCos.push_back(x);
+        InputRotationSin.push_back(x);
     }
 
     auto velocity = ReadData("D:/dnn/data/0_0.158275115632_500_velocity_0.txt");
@@ -154,8 +156,23 @@ void ATensorFlowNetwork::UpdateScene()
 
     for (int x = 0; x < 64 * 64; x++) {
         InputGradient[x] = (0.5 - (-std::cos(Rotation) * (HGradient[x] - 32) * Velocity / (8 * 64) - std::sin(Rotation) * (VGradient[x] - 32) * Velocity / (8 * 64)));
+
+        float RotationDelta = std::atan2(HGradient[x] - 32, VGradient[x] - 32.5) - Rotation;
+        InputRotationCos[x] = 0.5 + 0.5 * std::cos(RotationDelta);
+        InputRotationSin[x] = 0.5 + 0.5 * std::sin(RotationDelta);
     }
-    PrevMap = WriteDataToTexture(PrevMap, InputGradient);
+
+    if (DisplayMode < 3) {
+        return;
+    }
+
+    std::vector<std::vector<float>*> inputs {
+    &InputGradient,
+    &InputRotationCos,
+    &InputRotationSin
+    };
+
+    PrevMap = WriteDataToTexture(PrevMap, *inputs[DisplayMode - 3]);
 }
 // #pragma optimize( "", off )
 void ATensorFlowNetwork::ChangeDisplayMode(const int NewMode)
@@ -175,7 +192,7 @@ void ATensorFlowNetwork::ChangeDisplayMode(const int NewMode)
         DynamicMaterial->SetScalarParameterValue("WhiteWaterDisplay", 1.0);
         DynamicMaterial->SetScalarParameterValue("previewDisplay", 0.0);
     }
-    else if (NewMode == 3) {
+    else if (NewMode >= 3) {
         DynamicMaterial->SetScalarParameterValue("HeightDisplay", 0.0);
         DynamicMaterial->SetScalarParameterValue("previewDisplay", 1.0);
     }

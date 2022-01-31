@@ -72,9 +72,9 @@ private:
 	UTexture2D* PrevMap;
 
 	std::vector<float> InputGradient;
-	std::vector<float> InputRotationCosinus;
-	std::vector<float> InputRotationSinus; 
+	std::vector<float> InputRotationCos;
+	std::vector<float> InputRotationSin; 
 
-	uint8 DisplayMode{ 0 };
+	int8 DisplayMode{ 0 };
 	UMaterialInstanceDynamic* DynamicMaterial;
 };
