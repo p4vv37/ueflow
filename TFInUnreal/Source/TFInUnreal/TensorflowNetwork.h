@@ -50,20 +50,26 @@ public:
 
 	// Old: remove after updating blueprints.
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		float Angle{ 0 };
+		float Rotation{ 0 };
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		float Speed{ 0 };
+		float Velocity{ 1.0 };
 
 private:
 	TUniquePtr<cppflow::model> Model;
 
 	UTexture2D* WaterHeight; // (256, 256, 1)
 	UTexture2D* WhiteWater; // (256, 256, 1)
+
 	UTexture2D* StarADistanceMap; // (256, 256, 1)
 	UTexture2D* CircleDistanceMap; // (256, 256, 1)
 	UTexture2D* TriangleDistanceMap; // (256, 256, 1)
 	UTexture2D* SquareDistanceMap; // (256, 256, 1)
 	UTexture2D* StarBDistanceMap; // (256, 256, 1)
+
+	std::vector<float> VGradient;
+	std::vector<float> HGradient;
+
+	UTexture2D* PrevMap;
 
 	std::vector<float> InputGradient;
 	std::vector<float> InputRotationCosinus;

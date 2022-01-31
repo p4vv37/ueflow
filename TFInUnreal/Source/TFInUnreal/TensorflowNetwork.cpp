@@ -108,13 +108,24 @@ bool ATensorFlowNetwork::InitializeModel()
     }
     
     auto input = ReadData("D:/dnn/data/0_0.158275115632_500_input_0.txt");
+    for (int x = 0; x < 64; x++) {
+
+        for (int y = 0; y < 64; y++) {
+            HGradient.push_back(y);
+            VGradient.push_back(x);
+        }
+    }
+
+    for (int x = 0; x < 64 * 64; x++) {
+        InputGradient.push_back(x);
+    }
+
     auto velocity = ReadData("D:/dnn/data/0_0.158275115632_500_velocity_0.txt");
     UE_LOG(LogTemp, Warning, TEXT("********************************************"));
     UE_LOG(LogTemp, Warning, TEXT("********************************************"));
     UE_LOG(LogTemp, Warning, TEXT("********************************************"));
     UE_LOG(LogTemp, Warning, TEXT("********************************************"));
     UE_LOG(LogTemp, Warning, TEXT("********************************************"));
-
 
     // Creates Texture2D to store TextureRenderTarget content
     WaterHeight = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
@@ -123,10 +134,15 @@ bool ATensorFlowNetwork::InitializeModel()
     WhiteWater = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
     WhiteWater = WriteDataToTexture(WhiteWater, whiteWater);
 
-    
+    PrevMap = UTexture2D::CreateTransient(64, 64, PF_R32_FLOAT);
+    //PrevMap = WriteDataToTexture(PrevMap, InputGradient);
+
+
+
     DynamicMaterial = NewElement->GetStaticMeshComponent()->CreateAndSetMaterialInstanceDynamic(0);
     DynamicMaterial->SetTextureParameterValue("HeightMap", WaterHeight);
     DynamicMaterial->SetTextureParameterValue("WhitewaterMap", WhiteWater);
+    DynamicMaterial->SetTextureParameterValue("PrevMap", PrevMap);
     DynamicMaterial->SetVectorParameterValue("Color", FColor::Red);
 
 	return true;
@@ -135,6 +151,11 @@ bool ATensorFlowNetwork::InitializeModel()
 // #pragma optimize( "", off )
 void ATensorFlowNetwork::UpdateScene()
 {
+
+    for (int x = 0; x < 64 * 64; x++) {
+        InputGradient[x] = (0.5 - (-std::cos(Rotation) * (HGradient[x] - 32) * Velocity / (8 * 64) - std::sin(Rotation) * (VGradient[x] - 32) * Velocity / (8 * 64)));
+    }
+    PrevMap = WriteDataToTexture(PrevMap, InputGradient);
 }
 // #pragma optimize( "", off )
 void ATensorFlowNetwork::ChangeDisplayMode(const int NewMode)
@@ -142,14 +163,21 @@ void ATensorFlowNetwork::ChangeDisplayMode(const int NewMode)
     if (NewMode == 0) {
         DynamicMaterial->SetScalarParameterValue("HeightDisplay", 1.0);
         DynamicMaterial->SetScalarParameterValue("WhiteWaterDisplay", 1.0);
+        DynamicMaterial->SetScalarParameterValue("previewDisplay", 0.0);
     }
     else if (NewMode == 1) {
         DynamicMaterial->SetScalarParameterValue("HeightDisplay", 1.0);
         DynamicMaterial->SetScalarParameterValue("WhiteWaterDisplay", 0.0);
+        DynamicMaterial->SetScalarParameterValue("previewDisplay", 0.0);
     }
     else if (NewMode == 2) {
         DynamicMaterial->SetScalarParameterValue("HeightDisplay", 0.0);
         DynamicMaterial->SetScalarParameterValue("WhiteWaterDisplay", 1.0);
+        DynamicMaterial->SetScalarParameterValue("previewDisplay", 0.0);
+    }
+    else if (NewMode == 3) {
+        DynamicMaterial->SetScalarParameterValue("HeightDisplay", 0.0);
+        DynamicMaterial->SetScalarParameterValue("previewDisplay", 1.0);
     }
     DisplayMode = NewMode;
 }
