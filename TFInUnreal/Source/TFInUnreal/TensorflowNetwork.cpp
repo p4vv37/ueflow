@@ -81,6 +81,7 @@ bool ATensorFlowNetwork::InitializeModel()
     SpawnParams.bHideFromSceneOutliner = 0;
     SpawnParams.Instigator = GetInstigator();
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
     AStaticMeshActor* NewElement = GetWorld()->SpawnActor<AStaticMeshActor>(SpawnParams);
     NewElement->GetStaticMeshComponent()->SetStaticMesh(Mesh);
     NewElement->SetActorHiddenInGame(false);
@@ -129,7 +130,6 @@ bool ATensorFlowNetwork::InitializeModel()
     UE_LOG(LogTemp, Warning, TEXT("********************************************"));
     UE_LOG(LogTemp, Warning, TEXT("********************************************"));
 
-    // Creates Texture2D to store TextureRenderTarget content
     WaterHeight = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
     WaterHeight = WriteDataToTexture(WaterHeight, water);
 
@@ -137,9 +137,6 @@ bool ATensorFlowNetwork::InitializeModel()
     WhiteWater = WriteDataToTexture(WhiteWater, whiteWater);
 
     PrevMap = UTexture2D::CreateTransient(64, 64, PF_R32_FLOAT);
-    //PrevMap = WriteDataToTexture(PrevMap, InputGradient);
-
-
 
     DynamicMaterial = NewElement->GetStaticMeshComponent()->CreateAndSetMaterialInstanceDynamic(0);
     DynamicMaterial->SetTextureParameterValue("HeightMap", WaterHeight);
@@ -195,15 +192,11 @@ void ATensorFlowNetwork::UpdateScene()
     FTexture2DMipMap& Mip02 = WhiteWater->PlatformData->Mips[0];
     void* TextureData2 = Mip02.BulkData.Lock(LOCK_READ_WRITE);
     FMemory::Memcpy(x_n_data.data() + PIXEL_DATA_SIZE * 256 * 256, TextureData2, PIXEL_DATA_SIZE * 256 * 256);
-    // buffer.assign(view.GetData(), view.GetData() + view.Num());
 
-    cppflow::tensor x_pos(x_pos_data, { 1, 64, 64, 3 });
     // auto x_pos = cppflow::fill({ 1, 64, 64, 3 }, 1.0f);
+    cppflow::tensor x_pos(x_pos_data, { 1, 64, 64, 3 });
     cppflow::tensor x_n(x_n_data, { 1, 256, 256, 3 });
-    // auto x_n = cppflow::fill({ 1, 256, 256, 3 }, 1.0f);
 
-    std::vector<std::string> outputs;
-    outputs.push_back("StatefulPartitionedCall:0");
     auto test = (*Model).get_operations();
     auto output = (*Model)({ {"serving_default_x_n:0", x_n}, {"serving_default_x_pos:0", x_pos} }, { "StatefulPartitionedCall:0" });
     Result = output[0].get_data<float>();
