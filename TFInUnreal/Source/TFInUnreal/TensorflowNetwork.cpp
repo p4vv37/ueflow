@@ -28,7 +28,7 @@ UTexture2D* WriteDataToTexture(UTexture2D* ParamsTex, std::vector<float> data)
 
     for (int32 VoxelIndex1DInChunk = 0; VoxelIndex1DInChunk < NumPixelsInTexture; ++VoxelIndex1DInChunk)
     {
-        NewPixels[VoxelIndex1DInChunk] = (data[VoxelIndex1DInChunk] + 3) * 512;
+        NewPixels[VoxelIndex1DInChunk] = data[VoxelIndex1DInChunk];
     }
 
     FTexture2DMipMap& Mip0 = ParamsTex->PlatformData->Mips[0];
@@ -162,7 +162,7 @@ void ATensorFlowNetwork::UpdateScene()
         InputRotationSin[x] = 0.5 + 0.5 * std::sin(RotationDelta);
     }
 
-    if (DisplayMode < 3) {
+    if (DisplayMode < 3 || Puk) {
         return;
     }
 
@@ -170,9 +170,46 @@ void ATensorFlowNetwork::UpdateScene()
     &InputGradient,
     &InputRotationCos,
     &InputRotationSin
-    };
 
-    PrevMap = WriteDataToTexture(PrevMap, *inputs[DisplayMode - 3]);
+    };
+    std::vector<float> x_pos_data(64 * 64 * 3, 0.0);
+
+    for (int x = 0; x < 64 * 64; x++) {
+        x_pos_data[x] = InputGradient[x];
+    }
+    for (int x = 0; x < 64 * 64; x++) {
+        x_pos_data[x + 64] = InputRotationCos[x];
+    }
+    for (int x = 0; x < 64 * 64; x++) {
+        x_pos_data[x + 64 + 64] = InputRotationSin[x];
+    }
+
+    std::vector<float> x_n_data(256 * 256 * 3, 0.0);
+
+    FTexture2DMipMap& Mip0 = WaterHeight->PlatformData->Mips[0];
+    constexpr SIZE_T PIXEL_DATA_SIZE = sizeof(float);
+
+    void* TextureData = Mip0.BulkData.Lock(LOCK_READ_WRITE);
+    FMemory::Memcpy(x_n_data.data(), TextureData, PIXEL_DATA_SIZE * 256 * 256);
+    
+    FTexture2DMipMap& Mip02 = WhiteWater->PlatformData->Mips[0];
+    void* TextureData2 = Mip02.BulkData.Lock(LOCK_READ_WRITE);
+    FMemory::Memcpy(x_n_data.data() + PIXEL_DATA_SIZE * 256 * 256, TextureData2, PIXEL_DATA_SIZE * 256 * 256);
+    // buffer.assign(view.GetData(), view.GetData() + view.Num());
+
+    cppflow::tensor x_pos(x_pos_data, { 1, 64, 64, 3 });
+    // auto x_pos = cppflow::fill({ 1, 64, 64, 3 }, 1.0f);
+    cppflow::tensor x_n(x_n_data, { 1, 256, 256, 3 });
+    // auto x_n = cppflow::fill({ 1, 256, 256, 3 }, 1.0f);
+
+    std::vector<std::string> outputs;
+    outputs.push_back("StatefulPartitionedCall:0");
+    auto test = (*Model).get_operations();
+    auto output = (*Model)({ {"serving_default_x_n:0", x_n}, {"serving_default_x_pos:0", x_pos} }, { "StatefulPartitionedCall:0" });
+    Result = output[0].get_data<float>();
+
+    PrevMap = WriteDataToTexture(PrevMap, Result);
+    Puk = true;
 }
 // #pragma optimize( "", off )
 void ATensorFlowNetwork::ChangeDisplayMode(const int NewMode)

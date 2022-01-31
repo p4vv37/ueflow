@@ -38,7 +38,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		UStaticMesh* Mesh;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		FString ModelPath { "Source/ThirdParty/generator/saved_model.pb" };
+		FString ModelPath { "Source/ThirdParty/generator" };
 
 	UFUNCTION(BlueprintCallable)
 		bool InitializeModel();
@@ -77,4 +77,7 @@ private:
 
 	int8 DisplayMode{ 0 };
 	UMaterialInstanceDynamic* DynamicMaterial;
+
+	bool Puk{ false };
+	std::vector<float> Result;
 };
