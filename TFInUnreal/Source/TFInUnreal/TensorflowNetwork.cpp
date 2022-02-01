@@ -159,16 +159,24 @@ void ATensorFlowNetwork::UpdateScene()
         InputRotationSin[x] = 0.5 + 0.5 * std::sin(RotationDelta);
     }
 
-    if (DisplayMode < 3 || Puk) {
+    if (DisplayMode < 3) {
         return;
     }
 
     std::vector<std::vector<float>*> inputs {
-    &InputGradient,
-    &InputRotationCos,
-    &InputRotationSin
-
+        &InputGradient,
+        &InputRotationCos,
+        &InputRotationSin
     };
+
+    if (DisplayMode < 6) {
+        PrevMap = WriteDataToTexture(PrevMap, *inputs[DisplayMode - 3]);
+        return;
+    }
+    if (Puk) {
+        return;
+    }
+
     std::vector<float> x_pos_data(64 * 64 * 3, 0.0);
 
     for (int x = 0; x < 64 * 64; x++) {
@@ -193,15 +201,20 @@ void ATensorFlowNetwork::UpdateScene()
     void* TextureData2 = Mip02.BulkData.Lock(LOCK_READ_WRITE);
     FMemory::Memcpy(x_n_data.data() + PIXEL_DATA_SIZE * 256 * 256, TextureData2, PIXEL_DATA_SIZE * 256 * 256);
 
-    // auto x_pos = cppflow::fill({ 1, 64, 64, 3 }, 1.0f);
-    cppflow::tensor x_pos(x_pos_data, { 1, 64, 64, 3 });
-    cppflow::tensor x_n(x_n_data, { 1, 256, 256, 3 });
+    auto x_pos = cppflow::fill({ 1, 64, 64, 3 }, 0.0f);
+    // cppflow::tensor x_pos(x_pos_data, { 1, 64, 64, 3 });
+    auto x_n = cppflow::fill({ 1, 256, 256, 3 }, 0.0f);
+    // cppflow::tensor x_n(x_n_data, { 1, 256, 256, 3 });
 
-    auto test = (*Model).get_operations();
     auto output = (*Model)({ {"serving_default_x_n:0", x_n}, {"serving_default_x_pos:0", x_pos} }, { "StatefulPartitionedCall:0" });
     Result = output[0].get_data<float>();
 
-    PrevMap = WriteDataToTexture(PrevMap, Result);
+    std::vector<float> result(256 * 256, 0.0);
+    for (int x = 0; x < 256 * 256; x++) {
+        result[x] = Result[x*2 + 1];
+    }
+
+    PrevMap = WriteDataToTexture(PrevMap, result);
     Puk = true;
 }
 // #pragma optimize( "", off )
