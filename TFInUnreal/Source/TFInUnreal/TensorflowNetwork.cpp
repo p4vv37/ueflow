@@ -91,10 +91,10 @@ bool ATensorFlowNetwork::InitializeModel()
     cppflow::model model (stringPath);
     Model = MakeUnique<cppflow::model>(std::string(TCHAR_TO_UTF8(*ModelPath)));
     
-    auto water = ReadData("D:/dnn/data/0_0.158275115632_500__0.txt");
-    for (int n = 0; n < water.size(); n++) {
-        water[n] += 10;
-        water[n] /= 20;
+    WaterHeight = ReadData("D:/dnn/data/0_0.158275115632_500__0.txt");
+    for (int n = 0; n < WaterHeight.size(); n++) {
+        WaterHeight[n] += 10;
+        WaterHeight[n] /= 20;
     }
 
     auto whiteWater = ReadData("D:/dnn/data/0_0.158275115632_500_whitewater_0.txt");
@@ -119,8 +119,8 @@ bool ATensorFlowNetwork::InitializeModel()
         InputRotationSin.push_back(x);
     }
 
-    WaterHeight = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
-    WaterHeight = WriteDataToTexture(WaterHeight, water);
+    WaterHeightTexture = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
+    WaterHeightTexture = WriteDataToTexture(WaterHeightTexture, WaterHeight);
 
     WhiteWater = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
     WhiteWater = WriteDataToTexture(WhiteWater, whiteWater);
@@ -128,7 +128,7 @@ bool ATensorFlowNetwork::InitializeModel()
     PrevMap = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
 
     DynamicMaterial = NewElement->GetStaticMeshComponent()->CreateAndSetMaterialInstanceDynamic(0);
-    DynamicMaterial->SetTextureParameterValue("HeightMap", WaterHeight);
+    DynamicMaterial->SetTextureParameterValue("HeightMap", WaterHeightTexture);
     DynamicMaterial->SetTextureParameterValue("WhitewaterMap", WhiteWater);
     DynamicMaterial->SetTextureParameterValue("PrevMap", PrevMap);
     DynamicMaterial->SetVectorParameterValue("Color", FColor::Red);
@@ -207,6 +207,7 @@ void ATensorFlowNetwork::UpdateScene()
         x_n_data2.push_back(0);
     }
     for (int x = 0; x < 256 * 256; x++) {
+        x_n_data2[x * 3] = WaterHeight[x];
         x_n_data2[x * 3 + 2] = DistanceField[x];
     }
 
@@ -224,14 +225,13 @@ void ATensorFlowNetwork::UpdateScene()
 
     std::vector<float> result(256 * 256, 0.0);
     for (int x = 0; x < 256 * 256; x++) {
-        result[x] = Result[x * 2];
+        WaterHeight[x] = Result[x * 2];
     }
 
     WhiteWater = WriteDataToTexture(WhiteWater, result);
-    PrevMap = WriteDataToTexture(PrevMap, result);
+    PrevMap = WriteDataToTexture(PrevMap, WaterHeight);
+    WaterHeightTexture = WriteDataToTexture(WaterHeightTexture, WaterHeight);
     DynamicMaterial->SetTextureParameterValue("PrevMap", PrevMap);
-    Puk = testowanie.size() == 4;
-
 }
 // #pragma optimize( "", off )
 void ATensorFlowNetwork::ChangeDisplayMode(const int NewMode)
