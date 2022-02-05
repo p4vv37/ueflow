@@ -90,12 +90,6 @@ bool ATensorFlowNetwork::InitializeModel()
     std::string stringPath = std::string(TCHAR_TO_UTF8(*ModelPath));
     cppflow::model model (stringPath);
     Model = MakeUnique<cppflow::model>(std::string(TCHAR_TO_UTF8(*ModelPath)));
-
-    UE_LOG(LogTemp, Warning, TEXT("********************************************"));
-    UE_LOG(LogTemp, Warning, TEXT("********************************************"));
-    UE_LOG(LogTemp, Warning, TEXT("********************************************"));
-    UE_LOG(LogTemp, Warning, TEXT("********************************************"));
-    UE_LOG(LogTemp, Warning, TEXT("********************************************"));
     
     auto water = ReadData("D:/dnn/data/0_0.158275115632_500__0.txt");
     for (int n = 0; n < water.size(); n++) {
@@ -122,13 +116,6 @@ bool ATensorFlowNetwork::InitializeModel()
         InputRotationCos.push_back(x);
         InputRotationSin.push_back(x);
     }
-
-    auto velocity = ReadData("D:/dnn/data/0_0.158275115632_500_velocity_0.txt");
-    UE_LOG(LogTemp, Warning, TEXT("********************************************"));
-    UE_LOG(LogTemp, Warning, TEXT("********************************************"));
-    UE_LOG(LogTemp, Warning, TEXT("********************************************"));
-    UE_LOG(LogTemp, Warning, TEXT("********************************************"));
-    UE_LOG(LogTemp, Warning, TEXT("********************************************"));
 
     WaterHeight = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
     WaterHeight = WriteDataToTexture(WaterHeight, water);
@@ -173,9 +160,6 @@ void ATensorFlowNetwork::UpdateScene()
         PrevMap = WriteDataToTexture(PrevMap, *inputs[DisplayMode - 3]);
         return;
     }
-    // if (Puk) {
-    //     return;
-    // }
 
     std::vector<float> x_pos_data(64 * 64 * 3, 0.0);
 
@@ -189,21 +173,6 @@ void ATensorFlowNetwork::UpdateScene()
         x_pos_data[x + 64 + 64] = InputRotationSin[x];
     }
 
-    // std::vector<float> x_n_data(256 * 256 * 3, 0.0);
-
-    // FTexture2DMipMap& Mip0 = WaterHeight->PlatformData->Mips[0];
-    // constexpr SIZE_T PIXEL_DATA_SIZE = sizeof(float);
-
-    // void* TextureData = Mip0.BulkData.Lock(LOCK_READ_WRITE);
-    // FMemory::Memcpy(x_n_data.data(), TextureData, PIXEL_DATA_SIZE * 256 * 256);
-    
-    // FTexture2DMipMap& Mip02 = WhiteWater->PlatformData->Mips[0];
-    // void* TextureData2 = Mip02.BulkData.Lock(LOCK_READ_WRITE);
-    // FMemory::Memcpy(x_n_data.data() + PIXEL_DATA_SIZE * 256 * 256, TextureData2, PIXEL_DATA_SIZE * 256 * 256);
-
-
-    // x_pos_data = ReadData("D:/dnn/examples/x_pos.txt");
-    // auto x_pos = cppflow::fill({ 1, 64, 64, 3 }, 0.0f);
     std::vector<float> x_pos_data2;
     for (int x = 0; x < 64 * 64 * 3; x++) {
         x_pos_data2.push_back(0);
@@ -212,30 +181,22 @@ void ATensorFlowNetwork::UpdateScene()
         x_pos_data2[x * 3] = InputGradient[x];
     }
     cppflow::tensor x_pos(x_pos_data2, { 1, 64, 64, 3 });
-
-    //cppflow::tensor x_pos(x_pos_data, { 1, 64, 64, 3 });
-
-    // auto x_pos = cppflow::fill({ 1, 64, 64, 3 }, 0.0f);
-    auto dist = ReadData("D:/dnn/examples/distance_0.txt");
+    
+    auto DistanceField = ReadData("D:/git/ueflow/TFInUnreal/Source/ThirdParty/distances/distance_0.txt");
 
     std::vector<float> x_n_data2;
     for (int x = 0; x < 256 * 256 * 3; x++) {
         x_n_data2.push_back(0);
     }
     for (int x = 0; x < 256 * 256; x++) {
-        x_n_data2[x * 3 + 2] = dist[x];
+        x_n_data2[x * 3 + 2] = DistanceField[x];
     }
 
-    // auto x_n = cppflow::fill({ 1, 256, 256, 3 }, 0.0f);
-    // x_n_data = ReadData("D:/dnn/examples/x_n.txt");
     cppflow::tensor x_n(x_n_data2, { 1, 256, 256, 3 });
     auto test = x_n.get_data<float>();
 
-    // std::string stringPath = std::string(TCHAR_TO_UTF8(*ModelPath));
-    // cppflow::model model(stringPath);
-    // cppflow::model NewModel(std::string(TCHAR_TO_UTF8(*ModelPath)));
-
     auto output = (*Model)({ {"serving_default_x_n:0", x_n}, {"serving_default_x_pos:0", x_pos} }, { "StatefulPartitionedCall:0" });
+
     Result = output[0].get_data<double>();
     auto testowanie = output[0].shape().get_data<int>();
 

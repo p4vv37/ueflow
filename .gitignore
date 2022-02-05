@@ -26,3 +26,4 @@ venv/*
 samplesGeneration/logs/*
 model/*
 model/improved_model/keras_metadata.pb
+*.log
