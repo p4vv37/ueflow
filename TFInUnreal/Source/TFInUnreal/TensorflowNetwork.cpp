@@ -111,6 +111,8 @@ bool ATensorFlowNetwork::InitializeModel()
         }
     }
 
+    DistanceField = ReadData("D:/git/ueflow/TFInUnreal/Source/ThirdParty/distances/distance_0.txt");
+
     for (int x = 0; x < 64 * 64; x++) {
         InputGradient.push_back(x);
         InputRotationCos.push_back(x);
@@ -157,7 +159,25 @@ void ATensorFlowNetwork::UpdateScene()
     };
 
     if (DisplayMode < 6) {
-        PrevMap = WriteDataToTexture(PrevMap, *inputs[DisplayMode - 3]);
+        std::vector<float> UpscaledInput;
+        UpscaledInput.reserve(256 * 256);
+
+        for (int idx = 0; idx < 64; idx++) {
+            std::vector<float> row;
+            row.reserve(256);
+            for (int PixelId = 64 * idx; PixelId < 64 + 64 * idx; PixelId++) {
+                float pixel = (*inputs[DisplayMode - 3])[PixelId];
+                row.push_back(pixel);
+                row.push_back(pixel);
+                row.push_back(pixel);
+                row.push_back(pixel);
+            }
+            UpscaledInput.insert(UpscaledInput.end(), row.begin(), row.end());
+            UpscaledInput.insert(UpscaledInput.end(), row.begin(), row.end());
+            UpscaledInput.insert(UpscaledInput.end(), row.begin(), row.end());
+            UpscaledInput.insert(UpscaledInput.end(), row.begin(), row.end());
+        }
+        PrevMap = WriteDataToTexture(PrevMap, UpscaledInput);
         return;
     }
 
@@ -181,8 +201,6 @@ void ATensorFlowNetwork::UpdateScene()
         x_pos_data2[x * 3] = InputGradient[x];
     }
     cppflow::tensor x_pos(x_pos_data2, { 1, 64, 64, 3 });
-    
-    auto DistanceField = ReadData("D:/git/ueflow/TFInUnreal/Source/ThirdParty/distances/distance_0.txt");
 
     std::vector<float> x_n_data2;
     for (int x = 0; x < 256 * 256 * 3; x++) {
@@ -235,6 +253,7 @@ void ATensorFlowNetwork::ChangeDisplayMode(const int NewMode)
     }
     else if (NewMode >= 3) {
         DynamicMaterial->SetScalarParameterValue("HeightDisplay", 0.0);
+        DynamicMaterial->SetScalarParameterValue("WhiteWaterDisplay", 0.0);
         DynamicMaterial->SetScalarParameterValue("previewDisplay", 1.0);
     }
     DisplayMode = NewMode;

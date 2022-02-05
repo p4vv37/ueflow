@@ -74,6 +74,7 @@ private:
 	std::vector<float> InputGradient;
 	std::vector<float> InputRotationCos;
 	std::vector<float> InputRotationSin; 
+	std::vector<float> DistanceField;
 
 	int8 DisplayMode{ 0 };
 	UMaterialInstanceDynamic* DynamicMaterial;
