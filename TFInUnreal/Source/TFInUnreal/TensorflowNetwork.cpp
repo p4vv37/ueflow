@@ -195,7 +195,11 @@ void ATensorFlowNetwork::UpdateScene()
     cppflow::tensor x_n(x_n_data2, { 1, 256, 256, 3 });
     auto test = x_n.get_data<float>();
 
+    auto begin = std::chrono::high_resolution_clock::now();
     auto output = (*Model)({ {"serving_default_x_n:0", x_n}, {"serving_default_x_pos:0", x_pos} }, { "StatefulPartitionedCall:0" });
+    auto end = std::chrono::high_resolution_clock::now();
+
+    UE_LOG(LogTemp, Warning, TEXT("Network time: %d"), std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
 
     Result = output[0].get_data<double>();
     auto testowanie = output[0].shape().get_data<int>();
