@@ -79,5 +79,5 @@ private:
 	UMaterialInstanceDynamic* DynamicMaterial;
 
 	bool Puk{ false };
-	std::vector<float> Result;
+	std::vector<double> Result;
 };

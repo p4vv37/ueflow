@@ -136,7 +136,7 @@ bool ATensorFlowNetwork::InitializeModel()
     WhiteWater = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
     WhiteWater = WriteDataToTexture(WhiteWater, whiteWater);
 
-    PrevMap = UTexture2D::CreateTransient(64, 64, PF_R32_FLOAT);
+    PrevMap = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
 
     DynamicMaterial = NewElement->GetStaticMeshComponent()->CreateAndSetMaterialInstanceDynamic(0);
     DynamicMaterial->SetTextureParameterValue("HeightMap", WaterHeight);
@@ -173,9 +173,9 @@ void ATensorFlowNetwork::UpdateScene()
         PrevMap = WriteDataToTexture(PrevMap, *inputs[DisplayMode - 3]);
         return;
     }
-    if (Puk) {
-        return;
-    }
+    // if (Puk) {
+    //     return;
+    // }
 
     std::vector<float> x_pos_data(64 * 64 * 3, 0.0);
 
@@ -189,33 +189,66 @@ void ATensorFlowNetwork::UpdateScene()
         x_pos_data[x + 64 + 64] = InputRotationSin[x];
     }
 
-    std::vector<float> x_n_data(256 * 256 * 3, 0.0);
+    // std::vector<float> x_n_data(256 * 256 * 3, 0.0);
 
-    FTexture2DMipMap& Mip0 = WaterHeight->PlatformData->Mips[0];
-    constexpr SIZE_T PIXEL_DATA_SIZE = sizeof(float);
+    // FTexture2DMipMap& Mip0 = WaterHeight->PlatformData->Mips[0];
+    // constexpr SIZE_T PIXEL_DATA_SIZE = sizeof(float);
 
-    void* TextureData = Mip0.BulkData.Lock(LOCK_READ_WRITE);
-    FMemory::Memcpy(x_n_data.data(), TextureData, PIXEL_DATA_SIZE * 256 * 256);
+    // void* TextureData = Mip0.BulkData.Lock(LOCK_READ_WRITE);
+    // FMemory::Memcpy(x_n_data.data(), TextureData, PIXEL_DATA_SIZE * 256 * 256);
     
-    FTexture2DMipMap& Mip02 = WhiteWater->PlatformData->Mips[0];
-    void* TextureData2 = Mip02.BulkData.Lock(LOCK_READ_WRITE);
-    FMemory::Memcpy(x_n_data.data() + PIXEL_DATA_SIZE * 256 * 256, TextureData2, PIXEL_DATA_SIZE * 256 * 256);
+    // FTexture2DMipMap& Mip02 = WhiteWater->PlatformData->Mips[0];
+    // void* TextureData2 = Mip02.BulkData.Lock(LOCK_READ_WRITE);
+    // FMemory::Memcpy(x_n_data.data() + PIXEL_DATA_SIZE * 256 * 256, TextureData2, PIXEL_DATA_SIZE * 256 * 256);
 
-    auto x_pos = cppflow::fill({ 1, 64, 64, 3 }, 0.0f);
-    // cppflow::tensor x_pos(x_pos_data, { 1, 64, 64, 3 });
-    auto x_n = cppflow::fill({ 1, 256, 256, 3 }, 0.0f);
-    // cppflow::tensor x_n(x_n_data, { 1, 256, 256, 3 });
+
+    // x_pos_data = ReadData("D:/dnn/examples/x_pos.txt");
+    // auto x_pos = cppflow::fill({ 1, 64, 64, 3 }, 0.0f);
+    std::vector<float> x_pos_data2;
+    for (int x = 0; x < 64 * 64 * 3; x++) {
+        x_pos_data2.push_back(0);
+    }
+    for (int x = 0; x < 64 * 64; x++) {
+        x_pos_data2[x * 3] = InputGradient[x];
+    }
+    cppflow::tensor x_pos(x_pos_data2, { 1, 64, 64, 3 });
+
+    //cppflow::tensor x_pos(x_pos_data, { 1, 64, 64, 3 });
+
+    // auto x_pos = cppflow::fill({ 1, 64, 64, 3 }, 0.0f);
+    auto dist = ReadData("D:/dnn/examples/distance_0.txt");
+
+    std::vector<float> x_n_data2;
+    for (int x = 0; x < 256 * 256 * 3; x++) {
+        x_n_data2.push_back(0);
+    }
+    for (int x = 0; x < 256 * 256; x++) {
+        x_n_data2[x * 3 + 2] = dist[x];
+    }
+
+    // auto x_n = cppflow::fill({ 1, 256, 256, 3 }, 0.0f);
+    // x_n_data = ReadData("D:/dnn/examples/x_n.txt");
+    cppflow::tensor x_n(x_n_data2, { 1, 256, 256, 3 });
+    auto test = x_n.get_data<float>();
+
+    // std::string stringPath = std::string(TCHAR_TO_UTF8(*ModelPath));
+    // cppflow::model model(stringPath);
+    // cppflow::model NewModel(std::string(TCHAR_TO_UTF8(*ModelPath)));
 
     auto output = (*Model)({ {"serving_default_x_n:0", x_n}, {"serving_default_x_pos:0", x_pos} }, { "StatefulPartitionedCall:0" });
-    Result = output[0].get_data<float>();
+    Result = output[0].get_data<double>();
+    auto testowanie = output[0].shape().get_data<int>();
 
     std::vector<float> result(256 * 256, 0.0);
     for (int x = 0; x < 256 * 256; x++) {
-        result[x] = Result[x*2 + 1];
+        result[x] = Result[x * 2];
     }
 
+    WhiteWater = WriteDataToTexture(WhiteWater, result);
     PrevMap = WriteDataToTexture(PrevMap, result);
-    Puk = true;
+    DynamicMaterial->SetTextureParameterValue("PrevMap", PrevMap);
+    Puk = testowanie.size() == 4;
+
 }
 // #pragma optimize( "", off )
 void ATensorFlowNetwork::ChangeDisplayMode(const int NewMode)
