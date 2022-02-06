@@ -58,7 +58,7 @@ private:
 	TUniquePtr<cppflow::model> Model;
 
 	UTexture2D* WaterHeightTexture; // (256, 256, 1)
-	UTexture2D* WhiteWater; // (256, 256, 1)
+	UTexture2D* WhiteWaterTexture; // (256, 256, 1)
 
 	UTexture2D* StarADistanceMap; // (256, 256, 1)
 	UTexture2D* CircleDistanceMap; // (256, 256, 1)
@@ -72,6 +72,7 @@ private:
 	UTexture2D* PrevMap;
 
 	std::vector<float> WaterHeight;
+	std::vector<float> WhiteWaterData;
 	std::vector<float> InputGradient;
 	std::vector<float> InputRotationCos;
 	std::vector<float> InputRotationSin; 

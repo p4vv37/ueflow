@@ -148,9 +148,9 @@ void ATensorFlowNetwork::UpdateScene()
         InputRotationSin[x] = 0.5 + 0.5 * std::sin(RotationDelta);
     }
 
-    if (DisplayMode < 3) {
-        return;
-    }
+    // if (DisplayMode < 3) {
+    //     return;
+    // }
 
     std::vector<std::vector<float>*> inputs {
         &InputGradient,
