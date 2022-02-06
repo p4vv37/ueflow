@@ -148,17 +148,13 @@ void ATensorFlowNetwork::UpdateScene()
         InputRotationSin[x] = 0.5 + 0.5 * std::sin(RotationDelta);
     }
 
-    if (DisplayMode < 3) {
-        return;
-    }
-
     std::vector<std::vector<float>*> inputs {
         &InputGradient,
         &InputRotationCos,
         &InputRotationSin
     };
 
-    if (DisplayMode < 6) {
+    if (2 < DisplayMode && DisplayMode < 6) {
         std::vector<float> UpscaledInput;
         UpscaledInput.reserve(256 * 256);
 
@@ -184,22 +180,15 @@ void ATensorFlowNetwork::UpdateScene()
     std::vector<float> x_pos_data2(64 * 64 * 3);
     for (int x = 0; x < 64 * 64; x++) {
         x_pos_data2[x * 3] = InputGradient[x];
-    }
-    for (int x = 0; x < 64 * 64; x++) {
         x_pos_data2[x * 3 + 1] = InputRotationCos[x];
-    }
-    for (int x = 0; x < 64 * 64; x++) {
         x_pos_data2[x * 3 + 2] = InputRotationSin[x];
     }
     cppflow::tensor x_pos(x_pos_data2, { 1, 64, 64, 3 });
 
-    std::vector<float> x_n_data2;
-    for (int x = 0; x < 256 * 256 * 3; x++) {
-        x_n_data2.push_back(0);
-    }
-
+    std::vector<float> x_n_data2(256 * 256 * 3);
     for (int x = 0; x < 256 * 256; x++) {
         x_n_data2[x * 3] = WaterHeight[x];
+        x_n_data2[x * 3 + 1] = WhiteWaterData[x];
         x_n_data2[x * 3 + 2] = DistanceField[x];
     }
 
