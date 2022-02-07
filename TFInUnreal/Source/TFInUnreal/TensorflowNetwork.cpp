@@ -93,8 +93,9 @@ bool ATensorFlowNetwork::InitializeModel()
     
     WaterHeight = ReadData("D:/dnn/data/0_0.158275115632_500__0.txt");
     for (int n = 0; n < WaterHeight.size(); n++) {
-        WaterHeight[n] += 10;
-        WaterHeight[n] /= 20;
+        // WaterHeight[n] += 10;
+        // WaterHeight[n] /= 20;
+        WaterHeight[n] = 0;
     }
 
     WhiteWaterData = ReadData("D:/dnn/data/0_0.158275115632_500_whitewater_0.txt");
@@ -141,7 +142,7 @@ void ATensorFlowNetwork::UpdateScene()
 {
 
     for (int x = 0; x < 64 * 64; x++) {
-        InputGradient[x] = (0.5 - (-std::cos(Rotation) * (HGradient[x] - 32) * Velocity / (8 * 64) - std::sin(Rotation) * (VGradient[x] - 32) * Velocity / (8 * 64)));
+        InputGradient[x] = - (0.5 - (-std::cos(Rotation) * (HGradient[x] - 32) * Velocity / (8 * 64) - std::sin(Rotation) * (VGradient[x] - 32) * Velocity / (8 * 64)));
 
         float RotationDelta = std::atan2(HGradient[x] - 32, VGradient[x] - 32.5) - Rotation;
         InputRotationCos[x] = 0.5 + 0.5 * std::cos(RotationDelta);
