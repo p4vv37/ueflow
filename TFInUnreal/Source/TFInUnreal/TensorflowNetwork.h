@@ -57,26 +57,26 @@ public:
 private:
 	TUniquePtr<cppflow::model> Model;
 
-	UTexture2D* WaterHeightTexture; // (256, 256, 1)
-	UTexture2D* WhiteWaterTexture; // (256, 256, 1)
+	UTexture2D* WaterHeightTexture = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
+	UTexture2D* WhiteWaterTexture = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
 
-	UTexture2D* StarADistanceMap; // (256, 256, 1)
-	UTexture2D* CircleDistanceMap; // (256, 256, 1)
-	UTexture2D* TriangleDistanceMap; // (256, 256, 1)
-	UTexture2D* SquareDistanceMap; // (256, 256, 1)
-	UTexture2D* StarBDistanceMap; // (256, 256, 1)
+	UTexture2D* StarADistanceMap = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
+	UTexture2D* CircleDistanceMap = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
+	UTexture2D* TriangleDistanceMap = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
+	UTexture2D* SquareDistanceMap = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
+	UTexture2D* StarBDistanceMap = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
 
 	std::vector<float> VGradient;
 	std::vector<float> HGradient;
 
-	UTexture2D* PrevMap;
+	UTexture2D* PrevMap = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
 
-	std::vector<float> WaterHeight;
-	std::vector<float> WhiteWaterData;
-	std::vector<float> InputGradient;
-	std::vector<float> InputRotationCos;
-	std::vector<float> InputRotationSin; 
-	std::vector<float> DistanceField;
+	std::vector<float> WaterHeight = std::vector<float>(256 * 256, 0);
+	std::vector<float> WhiteWaterData = std::vector<float>(256 * 256, 0);
+	std::vector<float> InputGradient = std::vector<float>(256 * 256, 0);
+	std::vector<float> InputRotationCos = std::vector<float>(256 * 256, 0);
+	std::vector<float> InputRotationSin = std::vector<float>(256*256, 0);
+	std::vector<float> DistanceField = std::vector<float>(256 * 256, 0);
 
 	int8 DisplayMode{ 0 };
 	UMaterialInstanceDynamic* DynamicMaterial;

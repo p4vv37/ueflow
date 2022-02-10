@@ -91,18 +91,6 @@ bool ATensorFlowNetwork::InitializeModel()
     cppflow::model model (stringPath);
     Model = MakeUnique<cppflow::model>(std::string(TCHAR_TO_UTF8(*ModelPath)));
     
-    WaterHeight = ReadData("D:/dnn/data/0_0.158275115632_500__0.txt");
-    for (int n = 0; n < WaterHeight.size(); n++) {
-        // WaterHeight[n] += 10;
-        // WaterHeight[n] /= 20;
-        WaterHeight[n] = 0;
-    }
-
-    WhiteWaterData = ReadData("D:/dnn/data/0_0.158275115632_500_whitewater_0.txt");
-    for (int n = 0; n < WhiteWaterData.size(); n++) {
-        WhiteWaterData[n] /= 7.0;
-    }
-    
     auto input = ReadData("D:/dnn/data/0_0.158275115632_500_input_0.txt");
     for (int x = 0; x < 64; x++) {
 
@@ -114,19 +102,9 @@ bool ATensorFlowNetwork::InitializeModel()
 
     DistanceField = ReadData("D:/git/ueflow/TFInUnreal/Source/ThirdParty/distances/distance_0.txt");
 
-    for (int x = 0; x < 64 * 64; x++) {
-        InputGradient.push_back(x);
-        InputRotationCos.push_back(x);
-        InputRotationSin.push_back(x);
-    }
-
-    WaterHeightTexture = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
     WaterHeightTexture = WriteDataToTexture(WaterHeightTexture, WaterHeight);
 
-    WhiteWaterTexture = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
     WhiteWaterTexture = WriteDataToTexture(WhiteWaterTexture, WhiteWaterData);
-
-    PrevMap = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
 
     DynamicMaterial = NewElement->GetStaticMeshComponent()->CreateAndSetMaterialInstanceDynamic(0);
     DynamicMaterial->SetTextureParameterValue("HeightMap", WaterHeightTexture);
