@@ -1,5 +1,7 @@
 # ueflow
-Use TensorFlow models in an Unreal Engine 4 blueprint.
+TensorFlow model used to generate a water surface around a moving obstacle in an Unreal Engine 4.
+
+![Preview](prev.png)
 
 Based on cppflow - https://github.com/serizba/cppflow
 
