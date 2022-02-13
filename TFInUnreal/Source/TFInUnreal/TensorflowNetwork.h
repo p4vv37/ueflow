@@ -37,8 +37,8 @@ public:
 	ATensorFlowNetwork();
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		UStaticMesh* Mesh;
-	FString ModelPath{ "D:\\git\\ueflow\\TFInUnreal\\Source\\ThirdParty\\model" };
-	FString ModelSimplePath{ "D:\\git\\ueflow\\TFInUnreal\\Source\\ThirdParty\\model" };
+	FString ModelPath{ "D:\\git\\ueflow\\TFInUnreal\\Source\\ThirdParty\\generator" };
+	FString ModelSimplePath{ "D:\\git\\ueflow\\TFInUnreal\\Source\\ThirdParty\\simple_generator" };
 
 	UFUNCTION(BlueprintCallable)
 		bool InitializeModel();
@@ -46,6 +46,8 @@ public:
 		void UpdateScene();
 	UFUNCTION(BlueprintCallable)
 		void ChangeDisplayMode(const int NewMode);
+	UFUNCTION(BlueprintCallable)
+		void ChangeShape(const int NewShapeId);
 
 
 	// Old: remove after updating blueprints.

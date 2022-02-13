@@ -199,7 +199,14 @@ void ATensorFlowNetwork::UpdateScene()
     cppflow::tensor x_n(x_n_data2, { 1, 256, 256, 3 });
 
     auto begin = std::chrono::high_resolution_clock::now();
-    auto output = (*Model)({ {"serving_default_x_n:0", x_n}, {"serving_default_x_pos:0", x_pos} }, { "StatefulPartitionedCall:0" });
+    std::vector<cppflow::tensor> output; 
+    if (NetworkId == 0)
+    {
+        output = (*Model)({ {"serving_default_x_n:0", x_n}, {"serving_default_x_pos:0", x_pos} }, { "StatefulPartitionedCall:0" });
+    }
+    else {
+        output = (*ModelSimple)({ {"serving_default_x_n:0", x_n}, {"serving_default_x_pos_n:0", x_pos} }, { "StatefulPartitionedCall:0" });
+    }
     auto end = std::chrono::high_resolution_clock::now();
 
     UE_LOG(LogTemp, Warning, TEXT("Network calculation time: %d"), std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
@@ -242,6 +249,11 @@ void ATensorFlowNetwork::ChangeDisplayMode(const int NewMode)
         DynamicMaterial->SetScalarParameterValue("previewDisplay", 1.0);
     }
     DisplayMode = NewMode;
+}
+
+void ATensorFlowNetwork::ChangeShape(const int NewShapeId)
+{
+    ShapeId = NewShapeId;
 }
 
 // #pragma optimize( "", on ) 
