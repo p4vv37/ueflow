@@ -26,9 +26,9 @@ UTexture2D* WriteDataToTexture(UTexture2D* ParamsTex, std::vector<float> data)
     NewPixels.Init(ColorDefault, NumPixelsInTexture);
 
 
-    for (int32 VoxelIndex1DInChunk = 0; VoxelIndex1DInChunk < NumPixelsInTexture; ++VoxelIndex1DInChunk)
+    for (int32 PixelIndex1DInChunk = 0; PixelIndex1DInChunk < NumPixelsInTexture; ++PixelIndex1DInChunk)
     {
-        NewPixels[VoxelIndex1DInChunk] = data[VoxelIndex1DInChunk];
+        NewPixels[PixelIndex1DInChunk] = data[PixelIndex1DInChunk];
     }
 
     FTexture2DMipMap& Mip0 = ParamsTex->PlatformData->Mips[0];
@@ -74,7 +74,6 @@ bool ATensorFlowNetwork::InitializeModel()
         return false;
     }
 
-
     FActorSpawnParameters SpawnParams;
     SpawnParams.Owner = this;
     SpawnParams.NameMode = FActorSpawnParameters::ESpawnActorNameMode::Required_Fatal;
@@ -87,11 +86,9 @@ bool ATensorFlowNetwork::InitializeModel()
     NewElement->SetActorHiddenInGame(false);
     NewElement->SetMobility(EComponentMobility::Movable);
 
-    std::string stringPath = std::string(TCHAR_TO_UTF8(*ModelPath));
-    cppflow::model model (stringPath);
     Model = MakeUnique<cppflow::model>(std::string(TCHAR_TO_UTF8(*ModelPath)));
-    
-    auto input = ReadData("D:/dnn/data/0_0.158275115632_500_input_0.txt");
+    ModelSimple = MakeUnique<cppflow::model>(std::string(TCHAR_TO_UTF8(*ModelSimplePath)));
+
     for (int x = 0; x < 64; x++) {
 
         for (int y = 0; y < 64; y++) {
@@ -100,7 +97,11 @@ bool ATensorFlowNetwork::InitializeModel()
         }
     }
 
-    DistanceField = ReadData("D:/git/ueflow/TFInUnreal/Source/ThirdParty/distances/distance_0.txt");
+    DistanceField0 = ReadData("D:/git/ueflow/TFInUnreal/Source/ThirdParty/distances/0_distance.txt");
+    DistanceField1 = ReadData("D:/git/ueflow/TFInUnreal/Source/ThirdParty/distances/1_distance.txt");
+    DistanceField2 = ReadData("D:/git/ueflow/TFInUnreal/Source/ThirdParty/distances/2_distance.txt");
+    DistanceField3 = ReadData("D:/git/ueflow/TFInUnreal/Source/ThirdParty/distances/3_distance.txt");
+    DistanceField4 = ReadData("D:/git/ueflow/TFInUnreal/Source/ThirdParty/distances/4_distance.txt");
 
     WaterHeightTexture = WriteDataToTexture(WaterHeightTexture, WaterHeight);
 
@@ -165,6 +166,30 @@ void ATensorFlowNetwork::UpdateScene()
     cppflow::tensor x_pos(x_pos_data2, { 1, 64, 64, 3 });
 
     std::vector<float> x_n_data2(256 * 256 * 3);
+
+    float* DistanceField;
+    switch (ShapeId)
+    {
+    case 0:
+        DistanceField = DistanceField0.data();
+        break;
+    case 1:
+        DistanceField = DistanceField1.data();
+        break;
+    case 2:
+        DistanceField = DistanceField2.data();
+        break;
+    case 3:
+        DistanceField = DistanceField3.data();
+        break;
+    case 4:
+        DistanceField = DistanceField4.data();
+        break;
+    default:
+        DistanceField = DistanceField0.data();
+        break;
+    }
+
     for (int x = 0; x < 256 * 256; x++) {
         x_n_data2[x * 3] = WaterHeight[x];
         x_n_data2[x * 3 + 1] = WhiteWaterData[x];
@@ -177,7 +202,7 @@ void ATensorFlowNetwork::UpdateScene()
     auto output = (*Model)({ {"serving_default_x_n:0", x_n}, {"serving_default_x_pos:0", x_pos} }, { "StatefulPartitionedCall:0" });
     auto end = std::chrono::high_resolution_clock::now();
 
-    UE_LOG(LogTemp, Warning, TEXT("Network time: %d"), std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
+    UE_LOG(LogTemp, Warning, TEXT("Network calculation time: %d"), std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
 
     Result = output[0].get_data<double>();
     auto testowanie = output[0].shape().get_data<int>();
