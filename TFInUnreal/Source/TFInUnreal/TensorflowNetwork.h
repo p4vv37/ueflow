@@ -37,7 +37,7 @@ public:
 	ATensorFlowNetwork();
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		UStaticMesh* Mesh;
-	FString ModelPath{ "D:\\git\\ueflow\\TFInUnreal\\Source\\ThirdParty\\generator" };
+	FString ModelPath{ "D:\\git\\ueflow\\TFInUnreal\\Source\\ThirdParty\\model" };
 	FString ModelSimplePath{ "D:\\git\\ueflow\\TFInUnreal\\Source\\ThirdParty\\simple_generator" };
 
 	UFUNCTION(BlueprintCallable)

@@ -121,9 +121,14 @@ void ATensorFlowNetwork::UpdateScene()
 {
 
     for (int x = 0; x < 64 * 64; x++) {
-        InputGradient[x] = - (0.5 - (-std::cos(Rotation) * (HGradient[x] - 32) * Velocity / (8 * 64) - std::sin(Rotation) * (VGradient[x] - 32) * Velocity / (8 * 64)));
+        if (NetworkId == 0) {
+            InputGradient[x] = -(0.5 - (-std::cos(Rotation) * (HGradient[x] - 32) * Velocity / (8 * 64) - std::sin(Rotation) * (VGradient[x] - 32) * Velocity / (8 * 64)));
+        }
+        else {
+            InputGradient[x] = -100*(0.5 - (-std::cos(Rotation) * (HGradient[x] - 32) * Velocity / (8 * 64) - std::sin(Rotation) * (VGradient[x] - 32) * Velocity / (8 * 64)));
+        }
 
-        float RotationDelta = std::atan2(HGradient[x] - 32, VGradient[x] - 32.5) - Rotation;
+        float RotationDelta = std::atan2(VGradient[x] - 32.5, HGradient[x] - 32) - Rotation;
         InputRotationCos[x] = 0.5 + 0.5 * std::cos(RotationDelta);
         InputRotationSin[x] = 0.5 + 0.5 * std::sin(RotationDelta);
     }
@@ -157,15 +162,14 @@ void ATensorFlowNetwork::UpdateScene()
         return;
     }
 
-    std::vector<float> x_pos_data2(64 * 64 * 3);
+    std::vector<float> x_pos_data(64 * 64 * 3);
     for (int x = 0; x < 64 * 64; x++) {
-        x_pos_data2[x * 3] = InputGradient[x];
-        x_pos_data2[x * 3 + 1] = InputRotationCos[x];
-        x_pos_data2[x * 3 + 2] = InputRotationSin[x];
+        x_pos_data[x * 3] = InputGradient[x];
+        x_pos_data[x * 3 + 1] = InputRotationCos[x];
+        x_pos_data[x * 3 + 2] = InputRotationSin[x];
     }
-    cppflow::tensor x_pos(x_pos_data2, { 1, 64, 64, 3 });
+    cppflow::tensor x_pos(x_pos_data, { 1, 64, 64, 3 });
 
-    std::vector<float> x_n_data2(256 * 256 * 3);
 
     float* DistanceField;
     switch (ShapeId)
@@ -190,21 +194,30 @@ void ATensorFlowNetwork::UpdateScene()
         break;
     }
 
-    for (int x = 0; x < 256 * 256; x++) {
-        x_n_data2[x * 3] = WaterHeight[x];
-        x_n_data2[x * 3 + 1] = WhiteWaterData[x];
-        x_n_data2[x * 3 + 2] = DistanceField[x];
-    }
-
-    cppflow::tensor x_n(x_n_data2, { 1, 256, 256, 3 });
-
     auto begin = std::chrono::high_resolution_clock::now();
     std::vector<cppflow::tensor> output; 
     if (NetworkId == 0)
     {
+
+        std::vector<float> x_n_data(256 * 256 * 3);
+        for (int x = 0; x < 256 * 256; x++) {
+            x_n_data[x * 3] = WaterHeight[x];
+            x_n_data[x * 3 + 1] = WhiteWaterData[x];
+            x_n_data[x * 3 + 2] = DistanceField[x];
+        }
+        cppflow::tensor x_n(x_n_data, { 1, 256, 256, 3 });
+
         output = (*Model)({ {"serving_default_x_n:0", x_n}, {"serving_default_x_pos:0", x_pos} }, { "StatefulPartitionedCall:0" });
     }
     else {
+
+        std::vector<float> x_n_data(256 * 256 * 2);
+        for (int x = 0; x < 256 * 256; x++) {
+            x_n_data[x * 2] = WaterHeight[x];
+            x_n_data[x * 2 + 1] = DistanceField[x];
+        }
+        cppflow::tensor x_n(x_n_data, { 1, 256, 256, 2 });
+
         output = (*ModelSimple)({ {"serving_default_x_n:0", x_n}, {"serving_default_x_pos_n:0", x_pos} }, { "StatefulPartitionedCall:0" });
     }
     auto end = std::chrono::high_resolution_clock::now();
@@ -212,15 +225,21 @@ void ATensorFlowNetwork::UpdateScene()
     UE_LOG(LogTemp, Warning, TEXT("Network calculation time: %d"), std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
 
     Result = output[0].get_data<double>();
-    auto testowanie = output[0].shape().get_data<int>();
 
-    std::vector<float> result(256 * 256, 0.0);
-    for (int x = 0; x < 256 * 256; x++) {
-        WaterHeight[x] = Result[x * 2];
-        WhiteWaterData[x] = Result[x * 2 + 1];
+    if (NetworkId == 0) {
+        for (int x = 0; x < 256 * 256; x++) {
+            WaterHeight[x] = Result[x * 2];
+            WhiteWaterData[x] = Result[x * 2 + 1];
+        }
+    }
+    else {
+        for (int x = 0; x < 256 * 256; x++) {
+            WaterHeight[x] = Result[x];
+            WhiteWaterData[x] = 0.0;
+        }
     }
 
-    WhiteWaterTexture = WriteDataToTexture(WhiteWaterTexture, result);
+    WhiteWaterTexture = WriteDataToTexture(WhiteWaterTexture, WhiteWaterData);
     PrevMap = WriteDataToTexture(PrevMap, WaterHeight);
     WaterHeightTexture = WriteDataToTexture(WaterHeightTexture, WaterHeight);
     DynamicMaterial->SetTextureParameterValue("PrevMap", PrevMap);
