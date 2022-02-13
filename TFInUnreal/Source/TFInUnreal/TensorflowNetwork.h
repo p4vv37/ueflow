@@ -86,5 +86,6 @@ private:
 	int8 DisplayMode{ 0 };
 	int8 ShapeId{ 0 };
 
-	std::vector<double> Result;
+	std::vector<double> ResultDouble;
+	std::vector<float> ResultFloat;
 };

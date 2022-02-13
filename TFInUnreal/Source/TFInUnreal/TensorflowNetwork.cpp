@@ -162,14 +162,6 @@ void ATensorFlowNetwork::UpdateScene()
         return;
     }
 
-    std::vector<float> x_pos_data(64 * 64 * 3);
-    for (int x = 0; x < 64 * 64; x++) {
-        x_pos_data[x * 3] = InputGradient[x];
-        x_pos_data[x * 3 + 1] = InputRotationCos[x];
-        x_pos_data[x * 3 + 2] = InputRotationSin[x];
-    }
-    cppflow::tensor x_pos(x_pos_data, { 1, 64, 64, 3 });
-
 
     float* DistanceField;
     switch (ShapeId)
@@ -199,6 +191,14 @@ void ATensorFlowNetwork::UpdateScene()
     if (NetworkId == 0)
     {
 
+        std::vector<float> x_pos_data(64 * 64 * 3);
+        for (int x = 0; x < 64 * 64; x++) {
+            x_pos_data[x * 3] = InputGradient[x];
+            x_pos_data[x * 3 + 1] = InputRotationCos[x];
+            x_pos_data[x * 3 + 2] = InputRotationSin[x];
+        }
+        cppflow::tensor x_pos(x_pos_data, { 1, 64, 64, 3 });
+
         std::vector<float> x_n_data(256 * 256 * 3);
         for (int x = 0; x < 256 * 256; x++) {
             x_n_data[x * 3] = WaterHeight[x];
@@ -211,12 +211,17 @@ void ATensorFlowNetwork::UpdateScene()
     }
     else {
 
-        std::vector<float> x_n_data(256 * 256 * 2);
+        std::vector<float> x_pos_data(3);
+        x_pos_data[0] = Velocity * std::cos(Rotation) * 10000;
+        x_pos_data[1] = Velocity * 10000;
+        x_pos_data[2] = Velocity * std::sin(Rotation) * 10000;
+        cppflow::tensor x_pos(x_pos_data, { 1, 3, 1 });
+
+        std::vector<float> x_n_data(256 * 256);
         for (int x = 0; x < 256 * 256; x++) {
-            x_n_data[x * 2] = WaterHeight[x];
-            x_n_data[x * 2 + 1] = DistanceField[x];
+            x_n_data[x] = WaterHeight[x];
         }
-        cppflow::tensor x_n(x_n_data, { 1, 256, 256, 2 });
+        cppflow::tensor x_n(x_n_data, { 1, 256, 256, 1 });
 
         output = (*ModelSimple)({ {"serving_default_x_n:0", x_n}, {"serving_default_x_pos_n:0", x_pos} }, { "StatefulPartitionedCall:0" });
     }
@@ -224,17 +229,18 @@ void ATensorFlowNetwork::UpdateScene()
 
     UE_LOG(LogTemp, Warning, TEXT("Network calculation time: %d"), std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
 
-    Result = output[0].get_data<double>();
-
     if (NetworkId == 0) {
+        ResultDouble = output[0].get_data<double>();
+
         for (int x = 0; x < 256 * 256; x++) {
-            WaterHeight[x] = Result[x * 2];
-            WhiteWaterData[x] = Result[x * 2 + 1];
+            WaterHeight[x] = ResultDouble[x * 2];
+            WhiteWaterData[x] = ResultDouble[x * 2 + 1];
         }
     }
     else {
+        ResultFloat = output[0].get_data<float>();
         for (int x = 0; x < 256 * 256; x++) {
-            WaterHeight[x] = Result[x];
+            WaterHeight[x] = ResultFloat[x];
             WhiteWaterData[x] = 0.0;
         }
     }
