@@ -89,5 +89,4 @@ private:
 	int8 ShapeId{ 0 };
 
 	std::vector<double> ResultDouble;
-	std::vector<float> ResultFloat;
 };

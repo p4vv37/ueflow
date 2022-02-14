@@ -1,8 +1,8 @@
 # ueflow
 TensorFlow model used to generate a water surface around a moving obstacle in an Unreal Engine 4.
 
-![Preview](prev.jpg)
-![Preview](preview2.gif)
+![Preview](examples/prev.jpg)
+![Preview](examples/preview2.gif)
 
 Based on cppflow - https://github.com/serizba/cppflow
 

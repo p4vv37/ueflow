@@ -97,12 +97,6 @@ bool ATensorFlowNetwork::InitializeModel()
         }
     }
 
-    DistanceField0 = ReadData("D:/git/ueflow/TFInUnreal/Source/ThirdParty/distances/0_distance.txt");
-    DistanceField1 = ReadData("D:/git/ueflow/TFInUnreal/Source/ThirdParty/distances/1_distance.txt");
-    DistanceField2 = ReadData("D:/git/ueflow/TFInUnreal/Source/ThirdParty/distances/2_distance.txt");
-    DistanceField3 = ReadData("D:/git/ueflow/TFInUnreal/Source/ThirdParty/distances/3_distance.txt");
-    DistanceField4 = ReadData("D:/git/ueflow/TFInUnreal/Source/ThirdParty/distances/4_distance.txt");
-
     WaterHeightTexture = WriteDataToTexture(WaterHeightTexture, WaterHeight);
 
     WhiteWaterTexture = WriteDataToTexture(WhiteWaterTexture, WhiteWaterData);
@@ -228,13 +222,15 @@ void ATensorFlowNetwork::UpdateScene()
     }
     auto end = std::chrono::high_resolution_clock::now();
 
-    UE_LOG(LogTemp, Warning, TEXT("Network calculation time: %d"), std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+    UE_LOG(LogTemp, Warning, TEXT("Network calculation time: %d ms (1/%d of a second)"), ms, 1000 / ms);
 
     if (NetworkId == 0) {
         ResultDouble = output[0].get_data<double>();
 
         for (int x = 0; x < 256 * 256; x++) {
-            WaterHeight[x] = ResultDouble[x * 2];
+            WaterHeight[x] += ResultDouble[x * 2];
+            WaterHeight[x] /= 2;
             WhiteWaterData[x] = ResultDouble[x * 2 + 1];
         }
     }
