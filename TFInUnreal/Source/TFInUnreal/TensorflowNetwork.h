@@ -38,7 +38,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		UStaticMesh* Mesh;
 	FString ModelPath{ "D:\\git\\ueflow\\TFInUnreal\\Source\\ThirdParty\\model" };
-	FString ModelSimplePath{ "D:\\git\\ueflow\\TFInUnreal\\Source\\ThirdParty\\simple_generator" };
+	FString ModelSimplePath{ "E:\\models_out\\ueflow_export\\best_model (kolejna kopia)_resaved" };
 
 	UFUNCTION(BlueprintCallable)
 		bool InitializeModel();
@@ -75,11 +75,13 @@ private:
 	std::vector<float> InputGradient = std::vector<float>(256 * 256, 0);
 	std::vector<float> InputRotationCos = std::vector<float>(256 * 256, 0);
 	std::vector<float> InputRotationSin = std::vector<float>(256*256, 0);
+	std::vector<float> InputRotationGrad = std::vector<float>(256 * 256, 0);
 	std::vector<float> DistanceField0 = std::vector<float>(256 * 256, 0);
 	std::vector<float> DistanceField1 = std::vector<float>(256 * 256, 0);
 	std::vector<float> DistanceField2 = std::vector<float>(256 * 256, 0);
 	std::vector<float> DistanceField3 = std::vector<float>(256 * 256, 0);
 	std::vector<float> DistanceField4 = std::vector<float>(256 * 256, 0);
+	std::vector<float> DistanceFieldSmall = std::vector<float>(64 * 64, 0);
 
 	UMaterialInstanceDynamic* DynamicMaterial;
 
