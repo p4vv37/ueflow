@@ -20,6 +20,7 @@
 #include "Containers/RingBuffer.h" 
 #include <chrono>
 #include <thread>
+#include "Misc/Paths.h" 
 #include "TensorFlowNetwork.generated.h"
 
 
@@ -37,8 +38,8 @@ public:
 	ATensorFlowNetwork();
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		UStaticMesh* Mesh;
-	FString ModelPath{ "D:\\git\\ueflow\\TFInUnreal\\Source\\ThirdParty\\model" };
-	FString ModelSimplePath{ "E:\\models_out\\ueflow_export\\best_model (kolejna kopia)_resaved" };
+	FString ModelPath{ FPaths::ProjectContentDir() + "model_complex" };
+	FString ModelSimplePath{ FPaths::ProjectContentDir() + "model_simple" };
 
 	UFUNCTION(BlueprintCallable)
 		bool InitializeModel();
