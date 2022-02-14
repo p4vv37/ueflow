@@ -85,6 +85,7 @@ bool ATensorFlowNetwork::InitializeModel()
     NewElement->GetStaticMeshComponent()->SetStaticMesh(Mesh);
     NewElement->SetActorHiddenInGame(false);
     NewElement->SetMobility(EComponentMobility::Movable);
+    NewElement->GetStaticMeshComponent()->bCastVolumetricTranslucentShadow = true;
 
     Model = MakeUnique<cppflow::model>(std::string(TCHAR_TO_UTF8(*ModelPath)));
     ModelSimple = MakeUnique<cppflow::model>(std::string(TCHAR_TO_UTF8(*ModelSimplePath)));
@@ -206,7 +207,7 @@ void ATensorFlowNetwork::UpdateScene()
         std::vector<float> x_pos_data(64 * 64 * 4);
         for (int x = 0; x < 64 * 64; x++) {
             x_pos_data[x * 4] = DistanceFieldSmall[x];
-            x_pos_data[x * 4 + 1] = InputGradient[x] / 2.0;
+            x_pos_data[x * 4 + 1] = - InputGradient[x] / 2.0;
             x_pos_data[x * 4 + 2] = InputRotationCos[x];
             x_pos_data[x * 4 + 3] = InputRotationSin[x];
         }
@@ -221,7 +222,7 @@ void ATensorFlowNetwork::UpdateScene()
         output = (*ModelSimple)({ {"serving_default_x_n:0", x_n}, {"serving_default_x_pos:0", x_pos} }, { "StatefulPartitionedCall:0" });
     }
     auto end = std::chrono::high_resolution_clock::now();
-
+     
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
     UE_LOG(LogTemp, Warning, TEXT("Network calculation time: %d ms (1/%d of a second)"), ms, 1000 / ms);
 
