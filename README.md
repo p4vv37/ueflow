@@ -9,7 +9,7 @@ Based on cppflow - https://github.com/serizba/cppflow
 
 Requirements:
 CUDNN 8.1
-CUA 11.2
+CUDA 11.2
 
 Tensorflow C API libraries are needed. They can be downloaded from:
 https://www.tensorflow.org/install/lang_c
