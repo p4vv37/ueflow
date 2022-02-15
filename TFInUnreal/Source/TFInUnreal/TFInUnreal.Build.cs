@@ -23,23 +23,16 @@ public class TFInUnreal : ModuleRules
 
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "AssetTools", "SlateCore", "RHI" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
-		// Uncomment if you are using Slate UI
-		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
-
-		// Uncomment if you are using online features
-		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
-
-		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true 
-
 		PublicIncludePaths.Add(Path.Combine(ProjectRoot, "Source", "ThirdParty", "include"));
+		PublicAdditionalLibraries.Add(Path.Combine(ProjectRoot, "Source", "ThirdParty", "lib", "tensorflow.lib"));
 		RuntimeDependencies.Add(Path.Combine(ProjectRoot, "Source", "ThirdParty", "lib", "tensorflow.dll"));
-		System.IO.File.Copy(Path.Combine(ProjectRoot, "Source", "ThirdParty", "lib", "tensorflow.dll"), Path.Combine(ProjectRoot, "Binaries", Target.Platform.ToString(), "tensorflow.dll"), true);
-	
-
-		PublicAdditionalLibraries.Add("D:/git/cppflow/examples/efficientnet/build/Release/tensorflow.lib");
+		if(!System.IO.File.Exists(Path.Combine(ProjectRoot, "Binaries", Target.Platform.ToString(), "tensorflow.dll")))
+		{
+			System.IO.File.Copy(Path.Combine(ProjectRoot, "Source", "ThirdParty", "lib", "tensorflow.dll"), Path.Combine(ProjectRoot, "Binaries", Target.Platform.ToString(), "tensorflow.dll"), true);
+		}
 	}
 }

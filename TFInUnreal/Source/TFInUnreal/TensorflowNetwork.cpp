@@ -6,14 +6,6 @@
 #define MULTIPLIER 100.0f
 #define SLOWDOWN 1.0f
 
-#include <iostream>
-#include <vector>
-#include <string>
-#include <sstream>
-#include <fstream>
-#include "Engine/TextureRenderTarget2D.h" 
-#include "Rendering/SlateRenderer.h" 
-#include "AssetToolsModule.h"
 #include "RHICommandList.h"
 
 
@@ -50,7 +42,8 @@ ATensorFlowNetwork::ATensorFlowNetwork()
 
 
 std::vector<float> ReadData(const FString path) {
-    std::fstream in(*path);
+    std::string path_str(TCHAR_TO_UTF8 (*path));
+    std::fstream in(path_str);
     std::string line;
     std::vector<float> result;
 
@@ -77,7 +70,6 @@ bool ATensorFlowNetwork::InitializeModel()
     FActorSpawnParameters SpawnParams;
     SpawnParams.Owner = this;
     SpawnParams.NameMode = FActorSpawnParameters::ESpawnActorNameMode::Required_Fatal;
-    SpawnParams.bHideFromSceneOutliner = 0;
     SpawnParams.Instigator = GetInstigator();
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 

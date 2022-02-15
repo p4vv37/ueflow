@@ -8,19 +8,17 @@
 #include "cppflow/model.h"
 #include "cppflow/datatype.h"
 
-#include "CoreMinimal.h"
-#include "UObject/Object.h"
-#include "Engine/StaticMeshActor.h" 
-#include "Components/SphereComponent.h" 
-#include "Components/StaticMeshComponent.h" 
-#include "Engine/World.h" 
-#include "Misc/Paths.h"
-#include "Misc/FileHelper.h" 
-#include "Misc/Paths.h" 
-#include "Containers/RingBuffer.h" 
 #include <chrono>
-#include <thread>
-#include "Misc/Paths.h" 
+#include <vector>
+#include <string>
+#include <sstream>
+
+#include "CoreMinimal.h"
+#include "Engine/StaticMeshActor.h" 
+#include "Misc/Paths.h"
+#include "Engine/World.h" 
+#include "Engine/TextureRenderTarget2D.h" 
+#include "Rendering/SlateRenderer.h" 
 #include "TensorFlowNetwork.generated.h"
 
 
@@ -57,14 +55,14 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		float Velocity{ 1.0 };
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	uint8 NetworkId{ 0 };
+	uint8 NetworkId{ 1 };
 
 private:
 	TUniquePtr<cppflow::model> Model;
 	TUniquePtr<cppflow::model> ModelSimple;
 
 	UTexture2D* WaterHeightTexture = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
-	UTexture2D* WhiteWaterTexture = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
+	UTexture2D* WhiteWaterTexture = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT); 
 
 	std::vector<float> VGradient;
 	std::vector<float> HGradient;
