@@ -16,12 +16,14 @@ Requirements:
 CUDNN 8.1
 CUDA 11.2
 
+`https://github.com/serizba/cppflow/tree/cppflow2/include/cppflow` need to be placed in `TFInUnreal\Source\ThirdParty\include`
+
 Tensorflow C API libraries are needed. They can be downloaded from:
 https://www.tensorflow.org/install/lang_c
 And should be placed in:
-TFInUnreal/Source/ThirdParty/libtensorflow
+`TFInUnreal\Source\ThirdParty\`
 As an example, path to tensorflow.dll should like like this:
-TFInUnreal\Source\ThirdParty\libtensorflow\lib\tensorflow.dll
+`TFInUnreal\Source\ThirdParty\lib\tensorflow.dll`
 
 Both GPU and CPU versions should work, if versions of CUDNN and CUDA are correct.
 
@@ -34,3 +36,6 @@ TF_CAPI_EXPORT extern TF_WhileParams TF_NewWhile(TF_Graph* g, TF_Output* inputs,
 ```
 
 in `tensorflow\c\c_api.h`
+
+In the same file add following include:
+`#include <iterator>`
