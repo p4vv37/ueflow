@@ -27,8 +27,10 @@ Both GPU and CPU versions should work, if versions of CUDNN and CUDA are correct
 
 Unreal treats warning raised in cppflow as an error, so comment lines 942-944:
 
-    TF_CAPI_EXPORT extern TF_WhileParams TF_NewWhile(TF_Graph* g, TF_Output* inputs,
-                                                     int ninputs,
-                                                     TF_Status* status);
+``` c++
+TF_CAPI_EXPORT extern TF_WhileParams TF_NewWhile(TF_Graph* g, TF_Output* inputs,
+                                                 int ninputs,
+                                                 TF_Status* status);
+```
 
 in `tensorflow\c\c_api.h`
