@@ -21,10 +21,10 @@ public class TFInUnreal : ModuleRules
 	{
 
 
-		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+		CppStandard = CppStandardVersion.Cpp17;
 	
+		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject" });
-
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
 		PublicIncludePaths.Add(Path.Combine(ProjectRoot, "Source", "ThirdParty", "include"));
