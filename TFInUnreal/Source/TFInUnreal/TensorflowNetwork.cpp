@@ -222,21 +222,28 @@ void ATensorFlowNetwork::UpdateScene()
         ResultDouble = output[0].get_data<double>();
 
         for (int x = 0; x < 256 * 256; x++) {
+            if (DisplayMode == 1) {
+                PreviewData[x] = ResultDouble[x * 2];
+            }
             WaterHeight[x] += ResultDouble[x * 2];
             WaterHeight[x] /= 2;
+
             WhiteWaterData[x] = ResultDouble[x * 2 + 1];
         }
     }
     else {
         ResultDouble = output[0].get_data<double>();
         for (int x = 0; x < 256 * 256; x++) {
+            if (DisplayMode == 1) {
+                PreviewData[x] = ResultDouble[x];
+            }
             WaterHeight[x] = ResultDouble[x];
             WhiteWaterData[x] = 0.0;
         }
     }
 
     WhiteWaterTexture = WriteDataToTexture(WhiteWaterTexture, WhiteWaterData);
-    PrevMap = WriteDataToTexture(PrevMap, WaterHeight);
+    PrevMap = WriteDataToTexture(PrevMap, PreviewData);
     WaterHeightTexture = WriteDataToTexture(WaterHeightTexture, WaterHeight);
     DynamicMaterial->SetTextureParameterValue("PrevMap", PrevMap);
 }
@@ -249,9 +256,9 @@ void ATensorFlowNetwork::ChangeDisplayMode(const int NewMode)
         DynamicMaterial->SetScalarParameterValue("previewDisplay", 0.0);
     }
     else if (NewMode == 1) {
-        DynamicMaterial->SetScalarParameterValue("HeightDisplay", 1.0);
+        DynamicMaterial->SetScalarParameterValue("HeightDisplay", 0.0);
         DynamicMaterial->SetScalarParameterValue("WhiteWaterDisplay", 0.0);
-        DynamicMaterial->SetScalarParameterValue("previewDisplay", 0.0);
+        DynamicMaterial->SetScalarParameterValue("previewDisplay", 1.0);
     }
     else if (NewMode == 2) {
         DynamicMaterial->SetScalarParameterValue("HeightDisplay", 0.0);
