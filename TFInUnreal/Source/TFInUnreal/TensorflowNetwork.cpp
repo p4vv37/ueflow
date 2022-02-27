@@ -40,25 +40,6 @@ ATensorFlowNetwork::ATensorFlowNetwork()
     Mesh = StaticMeshFinder.Object;
 }
 
-
-std::vector<float> ReadData(const FString path) {
-    std::string path_str(TCHAR_TO_UTF8 (*path));
-    std::fstream in(path_str);
-    std::string line;
-    std::vector<float> result;
-
-    while (std::getline(in, line))
-    {
-        float value;
-        std::stringstream ss(line);
-
-        ss >> value;
-        result.push_back(value);
-    }
-    UE_LOG(LogTemp, Warning, TEXT("%d"), result.size());
-    return result;
-}
-
 bool ATensorFlowNetwork::InitializeModel()
 {
     if (!FPaths::DirectoryExists(ModelPath))
@@ -90,7 +71,7 @@ bool ATensorFlowNetwork::InitializeModel()
         }
     }
 
-    WaterHeightTexture = WriteDataToTexture(WaterHeightTexture, WaterHeight);
+    WaterHeightTexture = WriteDataToTexture(WaterHeightTexture, WaterHeightData);
 
     WhiteWaterTexture = WriteDataToTexture(WhiteWaterTexture, WhiteWaterData);
 
@@ -129,19 +110,19 @@ void ATensorFlowNetwork::UpdateScene()
         UpscaledInput.reserve(256 * 256);
 
         for (int idx = 0; idx < 64; idx++) {
-            std::vector<float> row;
-            row.reserve(256);
+            std::vector<float> Row;
+            Row.reserve(256);
             for (int PixelId = 64 * idx; PixelId < 64 + 64 * idx; PixelId++) {
                 float pixel = (*inputs[DisplayMode - 3])[PixelId];
-                row.push_back(pixel);
-                row.push_back(pixel);
-                row.push_back(pixel);
-                row.push_back(pixel);
+                Row.push_back(pixel);
+                Row.push_back(pixel);
+                Row.push_back(pixel);
+                Row.push_back(pixel);
             }
-            UpscaledInput.insert(UpscaledInput.end(), row.begin(), row.end());
-            UpscaledInput.insert(UpscaledInput.end(), row.begin(), row.end());
-            UpscaledInput.insert(UpscaledInput.end(), row.begin(), row.end());
-            UpscaledInput.insert(UpscaledInput.end(), row.begin(), row.end());
+            UpscaledInput.insert(UpscaledInput.end(), Row.begin(), Row.end());
+            UpscaledInput.insert(UpscaledInput.end(), Row.begin(), Row.end());
+            UpscaledInput.insert(UpscaledInput.end(), Row.begin(), Row.end());
+            UpscaledInput.insert(UpscaledInput.end(), Row.begin(), Row.end());
         }
         PrevMap = WriteDataToTexture(PrevMap, UpscaledInput);
         return;
@@ -176,99 +157,103 @@ void ATensorFlowNetwork::UpdateScene()
     if (NetworkId == 0)
     {
 
-        std::vector<float> x_pos_data(64 * 64 * 3);
+        std::vector<float> XPosData(64 * 64 * 3);
         for (int x = 0; x < 64 * 64; x++) {
-            x_pos_data[x * 3] = InputGradient[x];
-            x_pos_data[x * 3 + 1] = InputRotationCos[x];
-            x_pos_data[x * 3 + 2] = InputRotationSin[x];
+            XPosData[x * 3] = InputGradient[x];
+            XPosData[x * 3 + 1] = InputRotationCos[x];
+            XPosData[x * 3 + 2] = InputRotationSin[x];
         }
-        cppflow::tensor x_pos(x_pos_data, { 1, 64, 64, 3 });
+        cppflow::tensor XPos(XPosData, { 1, 64, 64, 3 });
 
-        std::vector<float> x_n_data(256 * 256 * 3);
+        std::vector<float> XNData(256 * 256 * 3);
         for (int x = 0; x < 256 * 256; x++) {
-            x_n_data[x * 3] = WaterHeight[x];
-            x_n_data[x * 3 + 1] = WhiteWaterData[x];
-            x_n_data[x * 3 + 2] = DistanceField[x];
+            XNData[x * 3] = WaterHeightData[x];
+            XNData[x * 3 + 1] = WhiteWaterData[x];
+            XNData[x * 3 + 2] = DistanceField[x];
         }
-        cppflow::tensor x_n(x_n_data, { 1, 256, 256, 3 });
+        cppflow::tensor XN(XNData, { 1, 256, 256, 3 });
 
-        output = (*Model)({ {"serving_default_x_n:0", x_n}, {"serving_default_x_pos:0", x_pos} }, { "StatefulPartitionedCall:0" });
+        output = (*Model)({ {"serving_default_x_n:0", XN}, {"serving_default_x_pos:0", XPos} }, { "StatefulPartitionedCall:0" });
     }
     else {
 
-        std::vector<float> x_pos_data(64 * 64 * 4);
+        std::vector<float> XPosData(64 * 64 * 4);
         for (int x = 0; x < 64 * 64; x++) {
-            x_pos_data[x * 4] = DistanceFieldSmall[x];
-            x_pos_data[x * 4 + 1] = - InputGradient[x] / 2.0;
-            x_pos_data[x * 4 + 2] = InputRotationCos[x];
-            x_pos_data[x * 4 + 3] = InputRotationSin[x];
+            XPosData[x * 4] = DistanceFieldSmall[x];
+            XPosData[x * 4 + 1] = - InputGradient[x] / 2.0;
+            XPosData[x * 4 + 2] = InputRotationCos[x];
+            XPosData[x * 4 + 3] = InputRotationSin[x];
         }
-        cppflow::tensor x_pos(x_pos_data, { 1, 64, 64, 4 });
+        cppflow::tensor XPos(XPosData, { 1, 64, 64, 4 });
 
-        std::vector<float> x_n_data(256 * 256);
-        for (int x = 0; x < 256 * 256; x++) {
-            x_n_data[x] = WaterHeight[x];
+        std::vector<float> XNData(256 * 256);
+        for (int X = 0; X < 256 * 256; X++) {
+            XNData[X] = WaterHeightData[X];
         }
-        cppflow::tensor x_n(x_n_data, { 1, 256, 256, 1 });
+        cppflow::tensor XN(XNData, { 1, 256, 256, 1 });
 
-        output = (*ModelSimple)({ {"serving_default_x_n:0", x_n}, {"serving_default_x_pos:0", x_pos} }, { "StatefulPartitionedCall:0" });
+        output = (*ModelSimple)({ {"serving_default_x_n:0", XN}, {"serving_default_x_pos:0", XPos} }, { "StatefulPartitionedCall:0" });
     }
-    auto end = std::chrono::high_resolution_clock::now();
-     
+
+    auto end = std::chrono::high_resolution_clock::now();     
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
     UE_LOG(LogTemp, Warning, TEXT("Network calculation time: %d ms (1/%d of a second)"), ms, 1000 / ms);
 
     if (NetworkId == 0) {
-        ResultDouble = output[0].get_data<double>();
+        Result = output[0].get_data<double>();
 
         for (int x = 0; x < 256 * 256; x++) {
             if (DisplayMode == 1) {
-                PreviewData[x] = ResultDouble[x * 2];
+                PreviewData[x] = Result[x * 2];
             }
-            WaterHeight[x] += ResultDouble[x * 2];
-            WaterHeight[x] /= 2;
+            WaterHeightData[x] += Result[x * 2];
+            WaterHeightData[x] /= 2;
 
-            WhiteWaterData[x] = ResultDouble[x * 2 + 1];
+            WhiteWaterData[x] = Result[x * 2 + 1];
         }
     }
     else {
-        ResultDouble = output[0].get_data<double>();
+        Result = output[0].get_data<double>();
         for (int x = 0; x < 256 * 256; x++) {
             if (DisplayMode == 1) {
-                PreviewData[x] = ResultDouble[x];
+                PreviewData[x] = Result[x];
             }
-            WaterHeight[x] = ResultDouble[x];
+            WaterHeightData[x] = Result[x];
             WhiteWaterData[x] = 0.0;
         }
     }
 
     WhiteWaterTexture = WriteDataToTexture(WhiteWaterTexture, WhiteWaterData);
     PrevMap = WriteDataToTexture(PrevMap, PreviewData);
-    WaterHeightTexture = WriteDataToTexture(WaterHeightTexture, WaterHeight);
+    WaterHeightTexture = WriteDataToTexture(WaterHeightTexture, WaterHeightData);
     DynamicMaterial->SetTextureParameterValue("PrevMap", PrevMap);
 }
 // #pragma optimize( "", off )
 void ATensorFlowNetwork::ChangeDisplayMode(const int NewMode)
 {
-    if (NewMode == 0) {
-        DynamicMaterial->SetScalarParameterValue("HeightDisplay", 1.0);
-        DynamicMaterial->SetScalarParameterValue("WhiteWaterDisplay", 1.0);
-        DynamicMaterial->SetScalarParameterValue("previewDisplay", 0.0);
-    }
-    else if (NewMode == 1) {
-        DynamicMaterial->SetScalarParameterValue("HeightDisplay", 0.0);
-        DynamicMaterial->SetScalarParameterValue("WhiteWaterDisplay", 0.0);
-        DynamicMaterial->SetScalarParameterValue("previewDisplay", 1.0);
-    }
-    else if (NewMode == 2) {
-        DynamicMaterial->SetScalarParameterValue("HeightDisplay", 0.0);
-        DynamicMaterial->SetScalarParameterValue("WhiteWaterDisplay", 1.0);
-        DynamicMaterial->SetScalarParameterValue("previewDisplay", 0.0);
-    }
-    else if (NewMode >= 3) {
-        DynamicMaterial->SetScalarParameterValue("HeightDisplay", 0.0);
-        DynamicMaterial->SetScalarParameterValue("WhiteWaterDisplay", 0.0);
-        DynamicMaterial->SetScalarParameterValue("previewDisplay", 1.0);
+    switch (NewMode)
+    {
+        case 0:
+        {
+            DynamicMaterial->SetScalarParameterValue("HeightDisplay", 1.0);
+            DynamicMaterial->SetScalarParameterValue("WhiteWaterDisplay", 1.0);
+            DynamicMaterial->SetScalarParameterValue("previewDisplay", 0.0);
+            break;
+        }
+        case 2:
+        {
+            DynamicMaterial->SetScalarParameterValue("HeightDisplay", 0.0);
+            DynamicMaterial->SetScalarParameterValue("WhiteWaterDisplay", 1.0);
+            DynamicMaterial->SetScalarParameterValue("previewDisplay", 0.0);
+            break;
+        }
+        default:
+        {
+            DynamicMaterial->SetScalarParameterValue("HeightDisplay", 0.0);
+            DynamicMaterial->SetScalarParameterValue("WhiteWaterDisplay", 0.0);
+            DynamicMaterial->SetScalarParameterValue("previewDisplay", 1.0);
+            break;
+        }
     }
     DisplayMode = NewMode;
 }
