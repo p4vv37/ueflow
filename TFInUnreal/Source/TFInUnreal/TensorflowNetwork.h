@@ -69,7 +69,8 @@ private:
 
 	UTexture2D* PrevMap = UTexture2D::CreateTransient(256, 256, PF_R32_FLOAT);
 
-	std::vector<float> WaterHeight = std::vector<float>(256 * 256, 0);
+	std::vector<float> WaterHeightData = std::vector<float>(256 * 256, 0);
+	std::vector<float> PreviewData = std::vector<float>(256 * 256, 0);
 	std::vector<float> WhiteWaterData = std::vector<float>(256 * 256, 0);
 	std::vector<float> InputGradient = std::vector<float>(256 * 256, 0);
 	std::vector<float> InputRotationCos = std::vector<float>(256 * 256, 0);
@@ -87,5 +88,5 @@ private:
 	int8 DisplayMode{ 0 };
 	int8 ShapeId{ 0 };
 
-	std::vector<double> ResultDouble;
+	std::vector<double> Result;
 };
