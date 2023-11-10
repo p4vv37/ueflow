@@ -14,7 +14,8 @@ Video demonstration (youtube):
 
 ![Part of thesis EN](http://www.pkowalski.com/wp_portfolio/wp-content/uploads/2022/02/short_EN.pdf)
 
-![Thesis](http://www.pkowalski.com/wp_portfolio/wp-content/uploads/2023/11/Pawe%C5%82_Kowalski-G%C5%82%C4%99bokie_sieci_w_grach_m_2023-2.pdf)
+[![Thesis](http://www.pkowalski.com/wp_portfolio/wp-content/uploads/2023/11/Pawe%C5%82_Kowalski-G%C5%82%C4%99bokie_sieci_w_grach_m_2023-2.pdf)
+](http://www.pkowalski.com/wp_portfolio/wp-content/uploads/2023/11/Pawe%C5%82_Kowalski-G%C5%82%C4%99bokie_sieci_w_grach_m_2023-2.pdf)
 
 ## Requirements
 Requirements:
