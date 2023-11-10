@@ -10,9 +10,9 @@ Video demonstration (youtube):
 ![Preview](examples/simple.gif)
 ![Preview](examples/complex.gif)
 
-![Part of thesis PL](short_EN.pdf)
+![Part of thesis PL](skrot_mgr.pdf)
 
-![Part of thesis EN](short_PL.pdf)
+![Part of thesis EN](short_EN.pdf)
 
 
 ## Requirements
