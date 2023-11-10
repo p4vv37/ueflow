@@ -14,7 +14,7 @@ Video demonstration (youtube):
 
 ![Part of thesis EN](http://www.pkowalski.com/wp_portfolio/wp-content/uploads/2022/02/short_EN.pdf)
 
-![Thesis [PL](http://www.pkowalski.com/wp_portfolio/wp-content/uploads/2023/11/Paweł_Kowalski-Głębokie_sieci_w_grach_m_2023-2.pdf)
+![Thesis PL](http://www.pkowalski.com/wp_portfolio/wp-content/uploads/2023/11/Paweł_Kowalski-Głębokie_sieci_w_grach_m_2023-2.pdf)
 
 ## Requirements
 Requirements:
